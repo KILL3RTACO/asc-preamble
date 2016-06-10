@@ -1,84 +1,53 @@
-Area       = require "./Area.js"
-Pathfinder = require "../Common/Pathfinder.js"
+Section = require "Section.js"
+GridUtil = require "../Common/GridUtil.js"
 
-getIndex = (x, y, width) -> return (y * width) + x
+DEF_FLOOR_W = 25
+DEF_FLOOR_H = 25
 
-module.exports = class Floor extends Pathfinder.Grid
+class Floor
 
-  @DEF_SIZE_X: 25
-  @DEF_SIZE_Y: 25
-
-  constructor: (id, name, sizeX, sizeY) ->
-    wwt.util.validateInt "id", id
-    wwt.util.validateString "name", name
-    @__id = id
-    @__name = name
-    sizeX = if typeof sizeX is "number" and Number.isInteger(sizeX) then sizeX else @constructor.DEF_SIZE_X
-    sizeY = if typeof sizeY is "number" and Number.isInteger(sizeY) then sizeY else @constructor.DEF_SIZE_Y
-    super [], sizeX, sizeY
-    @__initZones()
-    @__initAreas()
-    @__initNeighbors()
+  constructor: (@__id, @__name, @__environment, @__width = DEF_FLOOR_W, @__height = DEF_FLOOR_H) ->
+    @__sections = []
 
   getId: -> @__id
   getName: -> @__name
-  getSize: -> {x: @getWidth(), y: @getHeight()}
+  getWidth: -> @__width
+  getHeight: -> @__height
+  getEnvironment: -> @__environment
 
-  set: (x, y, area) ->
-    throw new Error("area must be an instance of Area") if area not instanceof Area
-    return super(x, y, area)
-
-  # Subclasses should override these
-  __initZones: ->
-  __initAreas: ->
-  __initNeighbors: ->
-
-  allowNeighbor: (x, y, dir = Area.ALL_DIRECTIONS, allow = true) ->
-    area = @getArea x, y
-    return if area is null
-
-    if wwt.util.isArray dir
-      (@allowNeighbor x, y, d) for d in dir
-      return
-    else
-      return if not Number.isInteger dir
-
-    if allow
-      area.setNeighbor dir, @neighborOf x, y, dir
-    else
-      area.setNeighbor dir, null
-
+  push: (section) ->
+    throw new Error("section.getFloor() and this don't match") if section.getFloor() isnt @
+    @__sections[GridUtil.toIndex section.getX(), section.getY(), @getWidth()] = section
     return @
+  get: (x, y) ->
+    return null if GridUtil.isOutOfBounds(x, y, @__width, @__height)
+    section = @__sections[GridUtil.toIndex section.getX(), section.getY(), @getWidth()]
+    return null if section is null or section is undefined
+    return section
 
-  neighborOf: (x, y, dir) ->
-    delta = Area.getDeltas dir
+  getNeighborOf: (x, y, dir) ->
+    delta = Section.getDelta(dir)
     return @get(x + delta.x, y + delta.y)
 
-  isEdge: (x, y, dir) ->
+  # Assuming the given section is accessible, is it possible to move in the given direction?
+  # For Cardinal Directions - true if the neighbor is not null and accessible
+  # For Diagonal Directions - true if it's possible to move in both of the two corresponding cardinal directions (TOP_LEFT = UP, LEFT)
+  canMoveTo: (x, y, dir) ->
     switch dir
-      when Area.UP then return y is 0
-      when Area.LEFT then return x is 0
-      when Area.RIGHT then return x is @getWidth() - 1
-      when Area.DOWN then return y is @getHeight() - 1
-      when Area.TOP_LEFT then return y is 0 or x is 0
-      when Area.TOP_RIGHT then return y is 0 or x is @getWidth() - 1
-      when Area.BOTTOM_LEFT then return x is 0 or y is @getHeight() - 1
-      when Area.BOTTOM_RIGHT then return x is @getWidth() - 1 or y is @getHeight() - 1
+      when Section.UP, Section.DOWN, Section.LEFT, Section.RIGHT
+        neighbor = @getNeighborOf(x, y, dir)
+        return neighbor isnt null and neighbor.getEnvironment().isAccessible()
+      when Section.TOP_LEFT
+        return @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.LEFT)
+      when Section.TOP_RIGHT
+        return @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.RIGHT)
+      when Section.BOTTOM_LEFT
+        return @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.LEFT)
+      when Section.BOTTOM_RIGHT
+        return @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.RIGHT)
       else return false
 
-  findPath: (start, goal, options) ->
-    startArea = @get(start.x, start.y); throw new Error("Start node has nowhere to go") if startArea is null or startArea is undefined or startArea.isWall()
-    goalArea = @get(goal.x, goal.y); throw new Error("Goal node is inaccessible") if goalArea is null or goalArea is undefined or goalArea.isWall()
-
-    options ?= {}
-    options.grid = this
-    pathfinder = new Pathfinder(options)
-    path = pathfinder.findPath startArea, goalArea
-
-    return null if path is null
-    return path
-
-  # Subclasses should override
+  # @OverrideMe
   getStartLocation: ->
     x: 0
     y: 0
