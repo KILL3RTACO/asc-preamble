@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <script>window.$ = window.jQuery = require("./js/jquery.min.js")</script>
+    <script src="./js/spectrum.js"></script>
+    <link rel="stylesheet" href="./css/spectrum.css"></script>
+    <script>window.wwt = require("./js/wwt.js")</script>
+    <script>
+      var edit = true;
+
+      $(document).ready(function(){
+        if(edit)
+          require("./js/PreambleFloorGen/Editor.js").start();
+        else
+          require("./js/preamble.js").init();
+      });
+    </script>
+  </head>
+  <body>
+    <!-- Everything is added via WWT (via Journey), and then modified by Asc and Preamble -->
+  </body>
+</html>
