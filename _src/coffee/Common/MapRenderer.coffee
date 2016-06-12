@@ -1,3 +1,5 @@
+clamp = (min, n, max) -> Math.min(Math.max(n, min), max)
+
 class MapRenderer
 
   # Marker styles
@@ -193,9 +195,11 @@ class MapRenderer
     @__ctx.restore()
 
   getCellLocation: (pixelX, pixelY) ->
+    x = pixelX // (@__cellSize + @__borderSize)
+    y = pixelY // (@__cellSize + @__borderSize)
     return {
-      x: pixelX // (@__cellSize + @__borderSize)
-      y: pixelY // (@__cellSize + @__borderSize)
+      x: clamp 0, x, @__width - 1
+      y: clamp 0, y, @__height - 1
     }
 
 if typeof module is "object" and typeof module.exports is "object"
