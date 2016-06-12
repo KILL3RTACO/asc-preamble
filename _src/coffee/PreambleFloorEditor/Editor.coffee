@@ -10,10 +10,11 @@ fs       = require "fs"
 
 # GUI - Widget Declaration
 env = floor = name = width = height = mapDataControl = paintOn = paintEnv = zoneId = pfControl = canvas = null
-util = null
 
 # util vars
 envNames = (e.getName() for e in Environment.values())
+util = null
+selected = null
 
 # GUI - Define and Layout Widgets
 initGui = ->
@@ -77,6 +78,20 @@ initGuiListeners = ->
 
   paintOn.addListener wwt.event.Selection, (e) -> paintEnv.setEnabled e.state
 
+  $(canvas).click (e) ->
+    pos = $(this).offset()
+    current = util.fr.getCellLocation(e.pageX - pos.left, e.pageY - pos.top)
+
+    # If we are painting, edit the sections via paintEnv
+    if paintOn.getState()
+      selected = null
+
+    # Otherwise, select(mark) the clicked cell
+    else
+      selected = current
+      util.render()
+      util.fr.colorMarkerRaw selected.x, selected.y, "orange"
+
 module.exports =
 
   start: ->
@@ -94,11 +109,10 @@ class EditorUtil
     @reloadAndSelect 1
 
   render: ->
-    @fr.setFloor @floor
     @fr.render()
 
   select: (id) ->
-    (@floor = @get id) if typeof id is "number"
+    (@getFloor(id)) if typeof id is "number"
     env.setText(@floor.getEnvironment().getName())
     name.setText(@floor.getName())
     width.setValue(@floor.getWidth())
@@ -106,13 +120,16 @@ class EditorUtil
     @render()
   reload: (id = @floor.getId()) ->
     @arena.reloadFloor id, true
-    @floor = @get id
+    @getFloor id
   reloadAndSelect: (id) ->
     @reload id
     @select()
 
   save: -> @arena.saveFloorState @floor.getId()
   get: (id) -> @arena.get id
+  getFloor: (id = @floor.getId()) ->
+    @floor = @get id
+    @fr.setFloor @floor
 
   clear: -> @floor.__sections.splice 0
   reset: ->
