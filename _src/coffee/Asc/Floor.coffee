@@ -2,9 +2,6 @@ Section     = require "./Section.js"
 GridUtil    = require "../Common/GridUtil.js"
 Environment = require "./Environment.js"
 
-DEF_FLOOR_W = 25
-DEF_FLOOR_H = 25
-
 module.exports = class Floor
 
   @DEF_W: 25
@@ -35,7 +32,7 @@ module.exports = class Floor
 
   push: (section) ->
     throw new Error("section.getFloor() and this don't match") if section.getFloor() isnt @
-    return if GrifUtil.isOutOfBounds section.getX(), section.getY(), @__width, @__height
+    return if GridUtil.isOutOfBounds section.getX(), section.getY(), @__width, @__height
     @__sections[GridUtil.toIndex section.getX(), section.getY(), @getWidth()] = section
     return @
   get: (x, y) ->
@@ -43,31 +40,46 @@ module.exports = class Floor
     section = @__sections[GridUtil.toIndex x, y, @getWidth()]
     return null if section is null or section is undefined
     return section
+  createSection: (x, y) ->
+    return null if GridUtil.isOutOfBounds x, y, @__width, @__height
+    section = new Section(this, x, y)
+    @push section
+    return section
 
   getNeighborOf: (x, y, dir) ->
     delta = Section.getDelta(dir)
     return @get(x + delta.x, y + delta.y)
 
-  # Can the given section move in the given direction? (accessibleness must match the neighbor)
-  # For diagonal direction, accessibleness must also match the neighbors in the two corresponding directions
-  # Exmaple - TOP_LEFT must also match UP and LEFT
   canMoveTo: (x, y, dir) ->
     section = @get(x, y)
-    accessible = if section isnt null then section.getEnvironment().isAccessible() else false
     neighbor = @getNeighborOf(x, y, dir)
-    neighborAccessible = neighbor isnt null and neighbor.getEnvironment().isAccessible()
-    accessibleMatch = neighborAccessible == accessible
+
+    # if both sections are null, accessibleness is true
+    # if section isnt null, but neighbor is, then accessibleness is true if section is inaccessible by all environments
+    accessible = (->
+      if section is null
+        if neighbor is null # both are null
+          return true
+        else # section is null, neighbor isnt
+          return not neighbor.getEnvironment().isAccessibleFrom(null)
+      else
+        if neighbor is null # section isnt null, neighbor is
+          return not section.getEnvironment().isAccessibleFrom(null)
+        else # neither are null
+          return neighbor.getEnvironment().isAccessibleFrom(section.getEnvironment())
+    )()
+
     switch dir
       when Section.UP, Section.DOWN, Section.LEFT, Section.RIGHT
-        return accessibleMatch
+        return accessible
       when Section.TOP_LEFT
-        return @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.LEFT) and accessibleMatch
+        return accessible and @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.LEFT)
       when Section.TOP_RIGHT
-        return @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.RIGHT) and accessibleMatch
+        return accessible and @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.RIGHT)
       when Section.BOTTOM_LEFT
-        return @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.LEFT) and accessibleMatch
+        return accessible and @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.LEFT)
       when Section.BOTTOM_RIGHT
-        return @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.RIGHT) and accessibleMatch
+        return accessible and @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.RIGHT)
       else return false
 
   # @OverrideMe
