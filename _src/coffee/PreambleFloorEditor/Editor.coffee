@@ -41,7 +41,9 @@ initGui = ->
   pfControl = new wwt.ButtonGroup(mainContainer, "pfControl")
   pfControl.addButton("", "Start")
   pfControl.addButton("", "Goal")
+  pfControl.addButton("", "Clear")
   pfControl.addButton("", "Run")
+  pfControl.setEnabled(false)
 
   mapContainer = new wwt.Composite("", "mapContainer")
   mapContainer.append("<canvas id='mrCanvas'></canvas>")
@@ -73,7 +75,34 @@ initGuiListeners = ->
   mapDataControl.getButton(0).addListener wwt.event.Selection, (e) -> util.clear(); util.save()
   mapDataControl.getButton(1).addListener wwt.event.Selection, (e) -> util.reset(); util.save()
 
-  paintOn.addListener wwt.event.Selection, (e) -> paintEnv.setEnabled e.state
+  pfListener = (prop) ->
+    return () ->
+      util.pf[prop] = util.selected
+      pfControl.getButton(2).setEnabled(util.pf.start isnt null or util.pf.goal isnt null)
+      pfControl.getButton(3).setEnabled(util.pf.start isnt null and util.pf.goal isnt null)
+      util.selectSection null
+      util.render()
+  pfControl.getButton(0).addListener wwt.event.Selection, pfListener("start")
+  pfControl.getButton(1).addListener wwt.event.Selection, pfListener("goal")
+  pfControl.getButton(2).addListener wwt.event.Selection, ->
+    util.clearPf()
+    util.selectSection null
+    util.render()
+    @setEnabled false
+    pfControl.getButton(3).setEnabled(false)
+  pfControl.getButton(3).addListener wwt.event.Selection, ->
+    path = util.floor.findPath(util.pf.start, util.pf.goal)
+
+    if path is null
+      alert("Pathfinder Error - Could not find a path")
+      return
+
+    util.fr.colorPathRaw(path, "orange")
+
+  paintOn.addListener wwt.event.Selection, (e) ->
+    util.selectSection null
+    util.render()
+    paintEnv.setEnabled e.state
 
   $(canvas).mousedown (e) ->
     # If we are painting, edit the sections via paintEnv
@@ -89,7 +118,7 @@ initGuiListeners = ->
     else
       util.selectSection util.getCell(e)
       util.render()
-      util.fr.colorMarkerRaw selected.x, selected.y, "orange"
+      util.fr.colorMarkerRaw util.selected.x, util.selected.y, "orange"
 
 module.exports =
 
@@ -101,12 +130,19 @@ module.exports =
 
 class EditorUtil
 
+  @CLEAR_PF: {start: null, goal: null}
+
   constructor: ->
+    @clearPf()
     @arena = require "../Preamble/PreambleArena.js"
     @selected = null
     @fr = new FloorRenderer()
     @fr.setCanvas canvas
     @reloadAndSelect 1
+
+  clearPf: ->
+    @pf = @constructor.CLEAR_PF
+    return @
 
   getCell: (e) ->
     pos = $(canvas).offset()
@@ -129,9 +165,15 @@ class EditorUtil
   render: ->
     @fr.setFloor @floor
     @fr.render()
+    if @pf.start
+      @fr.colorMarkerRaw @pf.start.x, @pf.start.y, "#0F0"
+    if @pf.goal
+      @fr.colorMarkerRaw @pf.goal.x, @pf.goal.y, "#F00"
 
   selectSection: (section) ->
     @selected = section
+    pfControl.getButton(0).setEnabled(section isnt null)
+    pfControl.getButton(1).setEnabled(section isnt null)
 
   select: (id) ->
     (@getFloor(id)) if typeof id is "number"
