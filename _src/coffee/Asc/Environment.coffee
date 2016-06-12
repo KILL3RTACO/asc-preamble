@@ -1,6 +1,6 @@
 Enum = require "../Common/Enum.js"
 
-class Environment extends Enum.GenericEntry
+class Environment extends Enum.GenericIdEntry
 
   constructor: (id, name, @__color, @__accessible = true) ->
     super id, name
@@ -8,7 +8,23 @@ class Environment extends Enum.GenericEntry
   getColor: -> @__color
   isAccessible: -> @__accessible
 
-module.exports = envs = new Enum()
+class EnvironmentEnum extends Enum
+
+  constructor: ->
+    super
+
+  getEnvironment: (id) ->
+    if typeof id is "number"
+      env = (=> return e for e in @values() when e.getId() is id)()
+    else if typeof id is "string"
+      env = (=> return e for e in @values() when e.getName() is id)()
+    else
+      return null
+
+    return null if env is null or env is undefined
+    return env
+
+module.exports = envs = new EnvironmentEnum()
 
 # Void - id 0
 envs.__addValue("VOID", new Environment(0, "Void", "#000", false))
