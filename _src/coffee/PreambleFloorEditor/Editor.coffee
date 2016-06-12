@@ -78,17 +78,19 @@ initGuiListeners = ->
 
   paintOn.addListener wwt.event.Selection, (e) -> paintEnv.setEnabled e.state
 
-  $(canvas).click (e) ->
-    pos = $(this).offset()
-    current = util.fr.getCellLocation(e.pageX - pos.left, e.pageY - pos.top)
-
+  $(canvas).mousedown (e) ->
     # If we are painting, edit the sections via paintEnv
     if paintOn.getState()
-      selected = null
+      util.selectSection null
+      util.paintCell e
+
+      $(this).mousemove (e) -> util.paintCell e
+      $(this).mouseup -> $(this).off "mousemove"
+
 
     # Otherwise, select(mark) the clicked cell
     else
-      selected = current
+      util.selectSection util.getCell(e)
       util.render()
       util.fr.colorMarkerRaw selected.x, selected.y, "orange"
 
@@ -104,12 +106,35 @@ class EditorUtil
 
   constructor: ->
     @arena = require "../Preamble/PreambleArena.js"
+    @selected = null
     @fr = new FloorRenderer()
     @fr.setCanvas canvas
     @reloadAndSelect 1
 
+  getCell: (e) ->
+    pos = $(canvas).offset()
+    return @fr.getCellLocation(e.pageX - pos.left, e.pageY - pos.top)
+
+  paintCell: (e) ->
+    currentCell = util.getCell e
+    currentEnv = Environment.getEnvironment(paintEnv.getText())
+    currentEnv ?= util.floor.getEnvironment()
+    section = util.floor.get(currentCell.x, currentCell.y)
+    created = false
+    if section is null
+      section = util.floor.createSection(currentCell.x, currentCell.y)
+      created = true
+    return if not created and section.getEnvironment().getId() is currentEnv.getId()
+    section.__environment = currentEnv
+    @save()
+    @render()
+
   render: ->
+    @fr.setFloor @floor
     @fr.render()
+
+  selectSection: (section) ->
+    @selected = section
 
   select: (id) ->
     (@getFloor(id)) if typeof id is "number"
@@ -131,7 +156,9 @@ class EditorUtil
     @floor = @get id
     @fr.setFloor @floor
 
-  clear: -> @floor.__sections.splice 0
+  clear: ->
+    @floor.__sections.splice 0
+    @render()
   reset: ->
     @clear()
     @floor.__width = Floor.DEF_W
