@@ -75,6 +75,8 @@ initGuiListeners = ->
   mapDataControl.getButton(0).addListener wwt.event.Selection, (e) -> util.clear(); util.save()
   mapDataControl.getButton(1).addListener wwt.event.Selection, (e) -> util.reset(); util.save()
 
+  paintOn.addListener wwt.event.Selection, (e) -> paintEnv.setEnabled e.state
+
 module.exports =
 
   start: ->
