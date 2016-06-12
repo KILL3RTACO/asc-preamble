@@ -1,4 +1,4 @@
-class GridUtil
+module.exports = class GridUtil
 
   @toIndex: (x, y, w) -> return (w * y) + x
   @fromIndex: (index, w) -> return {x: index % w, y: index // w}
@@ -15,7 +15,7 @@ class GridUtil
   @isCorner: (x, y, w, h) ->
     return @isTopLeft(x, y) or @isTopRight(x, y, w) or @isBottomLeft(x, y, h) or @isBottomRight(x, y, w, h)
 
-  @isOutOfBounds: (x, y, w, h) ->return x < 0 or y < 0 or x >= w or y >= h
+  @isOutOfBounds: (x, y, w, h) -> return x < 0 or y < 0 or x >= w or y >= h
 
   @getUpDelta: -> {x: 0, y: -1}
   @getDownDelta: -> {x: 0, y: 1}
