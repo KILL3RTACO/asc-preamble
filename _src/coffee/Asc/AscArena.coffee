@@ -1,14 +1,15 @@
 Floor = require "./Floor.js"
 
-class module.exports
+module.exports = class AscArena
 
   constructor: ->
     @__floors = []
 
-  addFloor: (floor) ->
-    throw new TypeError("floor is must be an instanceof Floor") if not floor instanceof Floor
-    @__floors.push floor
-  getFloor: (id) ->
-    return f for f in @__floors when f.getId() is id
-    return null
+  push: (floor) ->
+    throw new TypeError("floor is must be an instance of Floor") if floor is null or floor is undefined or floor not instanceof Floor
+    @__floors[floor.getId() - 1] = floor
+  get: (id) ->
+    f = @__floors[id - 1]
+    return null if f is null or f is undefined
+    return f
   size: -> @__floors.length

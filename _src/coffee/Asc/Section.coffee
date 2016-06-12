@@ -1,8 +1,14 @@
 GridUtil = require "../Common/GridUtil.js"
+Environment = require "./Environment.js"
 
-class Section
+module.exports = class Section
 
   {@UP, @DOWN, @LEFT, @RIGHT, @TOP_LEFT, @TOP_RIGHT, @ALL_DIRECTIONS} = require("../Common/Pathfinder.js").Node
+  @CARDINAL_DIRECTIONS: [@UP, @DOWN, @LEFT, @RIGHT]
+  @DIAGONAL_DIRECTIONS: [@TOP_LEFT, @TOP_RIGHT, @BOTTOM_LEFT, @BOTTOM_RIGHT]
+
+  @fromJson: (json, floor) ->
+    return new Section(floor, json.x, json.y, Environment.getEnvironment(json.env))
 
   @getDelta: (dir) ->
     switch dir
@@ -26,3 +32,9 @@ class Section
   getEnvironment: -> @__environment
   getNeighbor: (dir) -> @__floor.getNeighborOf(@__x, @__y, dir)
   canMoveTo: (dir) -> @__floor.canMoveTo(@__x, @__y, dir)
+
+  toJson: ->
+    floor: @__floor.getId()
+    x: @__x
+    y: @__y
+    env: @__environment.getId()

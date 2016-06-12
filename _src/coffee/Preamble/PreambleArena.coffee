@@ -1,20 +1,36 @@
 AscArena = require "../Asc/AscArena.js"
-Preamble  = require "../preamble.js"
-fs        = rewuire "fs"
+Floor    = require "../Asc/Floor.js"
+fs       = require "fs"
 
-colors = fs.readFileSync("#{__dirname}/Floors/ColorPresets.json")
+class PreambleArena extends AscArena
 
-module.exports = arena = new AscArena()
+  @getFileName: (floorId) -> return "#{__dirname}/Floors/Floor#{floorId}.json"
 
-floor = 1
-while true # Add floors indefinetely until Floor[floor + 1].js is not found
-  filename = "./Floors/Floor#{floor}.json"
-  try
-    f = Preamble.getFloorFromData fs.readFileSync(filename, "UTF-8"), colors
-    arena.addFloor f
-  catch error
-    break
+  constructor: ->
+    super
 
-  floor++
+  load: ->
+    @__floors.splice 0
+    floorId = 1
+    while true
+      break if not reloadFloor floorId++
 
-console.log "Loaded the Preamble Arena: #{arena.size()} floors found."
+  reloadFloor: (id, create = false) ->
+    filename = @constructor.getFileName id
+    try
+      json = JSON.parse fs.readFileSync(filename, "utf8")
+      @push Floor.fromJson(json)
+      return true
+    catch err
+      return false if not create
+      floor = new Floor(id, "")
+      @push floor
+      @saveFloorState id
+      return true
+
+  saveFloorState: (id) ->
+    f = @get id
+    return if f is null
+    fs.writeFileSync @constructor.getFileName(id), JSON.stringify(f.toJson())
+
+module.exports = new PreambleArena()

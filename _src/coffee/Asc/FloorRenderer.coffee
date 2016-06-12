@@ -1,36 +1,22 @@
-Area         = require "./Area.js"
+Section       = require "./Section.js"
 PreambleArea = require "../Preamble/PreambleArea.js"
 MapRenderer  = require "../Common/MapRenderer.js"
+GridUtil     = require "../Common/GridUtil.js"
 
 {TOP, BOTTOM, LEFT, RIGHT} = MapRenderer
 
-getCorner = (x, y, floor) ->
-  return Area.TOP_LEFT if x is 0 and y is 0
-  return Area.TOP_RIGHT if y is 0 and x is floor.getWidth() - 1
-  return Area.BOTTOM_LEFT if x is 0 and y is floor.getHeight() - 1
-  return Area.BOTTOM_RIGHT if x is floor.getWidth() - 1 and y is floor.getHeight() - 1
-  return null
+SECTION_TO_MR = []
+SECTION_TO_MR[Section.UP] = TOP
+SECTION_TO_MR[Section.LEFT] = LEFT
+SECTION_TO_MR[Section.DOWN] = BOTTOM
+SECTION_TO_MR[Section.RIGHT] = RIGHT
 
-onCorner = (corner, x, y, floor) -> return getCorner(x, y, floor) is corner
-
-onSide = (side, x, y, floor) ->
-  return (side is Area.UP and y is 0) or
-         (side is Area.DOWN and y is floor.getHeight() - 1) or
-         (side is Area.LEFT and x is 0) or
-         (side is Area.RIGHT and x is floor.getWidth() - 1)
-
-getSide = (x, y, floor) ->
-  return Area.UP if onSide Area.UP, x, y, floor
-  return Area.DOWN if onSide Area.DOWN, x, y, floor
-  return Area.LEFT if onSide Area.LEFT, x, y, floor
-  return Area.RIGHT if onSide Area.RIGHT, x, y, floor
-  return null
-
-AREA_TO_MR = []
-AREA_TO_MR[Area.UP] = TOP
-AREA_TO_MR[Area.LEFT] = LEFT
-AREA_TO_MR[Area.DOWN] = BOTTOM
-AREA_TO_MR[Area.RIGHT] = RIGHT
+onSide = (dir, x, y, floor) ->
+  switch dir
+    when Section.UP then return GridUtil.isTop y
+    when Section.DOWN then return GridUtil.isBottom y, floor.getHeight()
+    when Section.LEFT then return GridUtil.isLeft x
+    when Section.RIGHT then return GridUtil.isRight x, floor.getWidth()
 
 module.exports = class FloorRenderer extends MapRenderer
 
@@ -43,14 +29,12 @@ module.exports = class FloorRenderer extends MapRenderer
   getFloor: -> @__floor
 
   render: ->
-    areaVoid = false
-
     for y in [0...@__floor.getHeight()]
       for x in [0...@__floor.getWidth()]
-        area = @__floor.get x, y
-        areaVoid = area is undefined or area is null
+        section = @__floor.get x, y
+        sectionVoid = section is null
 
-        bg = if areaVoid then @__voidColor else area.getBgColor()
+        bg = if sectionVoid then @__voidColor else section.getEnvironment().getColor()
 
         #Render cell
         @colorRaw x, y, bg
@@ -58,14 +42,13 @@ module.exports = class FloorRenderer extends MapRenderer
 
     for y in [0...@__floor.getHeight()]
       for x in [0...@__floor.getWidth()]
-        area = @__floor.get x, y
-        areaVoid = area is undefined or area is null
+        section = @__floor.get x, y
+        sectionVoid = section is null
 
-        for d in [Area.UP, Area.LEFT, Area.RIGHT, Area.DOWN]
-          # do (x, y, d, areaVoid, area) =>
-            areaTest = @__floor.neighborOf(x, y, d)
-            areaTestVoid = areaTest is null or areaTest is undefined
-            @colorBorderRaw x, y, @__borderColor, AREA_TO_MR[d] if onSide(d, x, y, @__floor) or not (areaVoid or area.canGo(d))
+        for d in Section.CARDINAL_DIRECTIONS
+          sectionTest = @__floor.getNeighborOf(x, y, d)
+          sectionTestVoid = sectionTest is null
+          @colorBorderRaw x, y, @__borderColor, SECTION_TO_MR[d] if onSide(d, x, y, @__floor) or not (sectionVoid or section.canMoveTo(d))
 
   findPathAndDraw: (start, goal, distanceFormula, color = "#FF7F00") ->
     path = @__floor.findPath start, goal, {distanceFormula} #CHEBYSHEV
