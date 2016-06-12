@@ -73,13 +73,13 @@ module.exports = class Floor
       when Section.UP, Section.DOWN, Section.LEFT, Section.RIGHT
         return accessible
       when Section.TOP_LEFT
-        return accessible and @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.LEFT)
+        return accessible and (@canMoveTo(x, y, Section.UP) or @canMoveTo(x, y, Section.LEFT))
       when Section.TOP_RIGHT
-        return accessible and @canMoveTo(x, y, Section.UP) and @canMoveTo(x, y, Section.RIGHT)
+        return accessible and (@canMoveTo(x, y, Section.UP) or @canMoveTo(x, y, Section.RIGHT))
       when Section.BOTTOM_LEFT
-        return accessible and @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.LEFT)
+        return accessible and (@canMoveTo(x, y, Section.DOWN) or @canMoveTo(x, y, Section.LEFT))
       when Section.BOTTOM_RIGHT
-        return accessible and @canMoveTo(x, y, Section.DOWN) and @canMoveTo(x, y, Section.RIGHT)
+        return accessible and (@canMoveTo(x, y, Section.DOWN) or @canMoveTo(x, y, Section.RIGHT))
       else return false
 
   # @OverrideMe
