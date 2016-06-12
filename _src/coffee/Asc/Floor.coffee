@@ -35,6 +35,7 @@ module.exports = class Floor
 
   push: (section) ->
     throw new Error("section.getFloor() and this don't match") if section.getFloor() isnt @
+    return if GrifUtil.isOutOfBounds section.getX(), section.getY(), @__width, @__height
     @__sections[GridUtil.toIndex section.getX(), section.getY(), @getWidth()] = section
     return @
   get: (x, y) ->
