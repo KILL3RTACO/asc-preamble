@@ -7,7 +7,7 @@ body
 #width, #height, #zoneId
   width: 3.5em
 
-#nameLabel,  #widthLabel, #heightLabel, #zoneIdLabel, #mapControl, #pathfinderLabel
+#nameLabel,  #floorSizeLabel, #zoneIdLabel, #mapControl, #pfControlLabel
   margin-left: 1em
 
 #mapContainer
@@ -18,65 +18,8 @@ body
 #mapCanvas:active
   cursor: default
 
-#paintContainer, #neighborsContainer, #neighborControlContainer, #ncLeft
-  display: inline-block
-  vertical-align: top
-
-#neighborsContainer
-  margin-top: .25em
-  width: 10em
-
-#neighborControlContainer
-  margin-left: 2em
-
-  .ButtonGroup
-    width: 100%
-
-    .ToggleButton
-      width: 33.33%
-
-#neighborControlRow1
-  margin-bottom: 0
-
-  .ToggleButton:first-child
-    border-bottom-left-radius: 0
-
-  .ToggleButton:last-child
-    border-bottom-right-radius: 0
-
-#neighborControlRow2
-  margin-top: 0
-  margin-bottom: 0
-
-  .ToggleButton
-    border-top: none
-
-  .ToggleButton:first-child
-    border-top-left-radius: 0
-    border-bottom-left-radius: 0
-
-  .ToggleButton:last-child
-    border-top-right-radius: 0
-    border-bottom-right-radius: 0
-
-#neighborControlRow3
-  margin-top: 0
-
-  .ToggleButton
-    border-top: none
-
-  .ToggleButton:first-child
-    border-top-left-radius: 0
-
-  .ToggleButton:last-child
-    border-top-right-radius: 0
-
 #pfDistanceFormula
   width: 7.5em
 
-#paintPreset, #paintName
-  margin-left: 2em
-  width: 12.5em
-
-#neighborsContainer
-  margin-left: 2em
+#environmentList, #floorList, #paintEnv
+  width: 10em
