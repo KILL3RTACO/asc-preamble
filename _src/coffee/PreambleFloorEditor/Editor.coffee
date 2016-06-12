@@ -37,9 +37,6 @@ initGui = ->
   paintOn = new wwt.Check(mainContainer, "paintOn").setText("Paint").setState(true)
   paintEnv = new wwt.Combo(mainContainer, "paintEnv").setItems(["Default", envNames...]).setText("Default").setEnabled(paintOn.getState())
 
-  new wwt.Label(mainContainer, "zoneIdLabel").setText("Zone ID:")
-  zoneId = new wwt.Spinner(mainContainer, "zoneId").setMinimum(0)
-
   new wwt.Label(mainContainer, "pfControlLabel").setText("Pathfinder:")
   pfControl = new wwt.ButtonGroup(mainContainer, "pfControl")
   pfControl.addButton("", "Start")

@@ -2,6 +2,12 @@ AscArena = require "../Asc/AscArena.js"
 Floor    = require "../Asc/Floor.js"
 fs       = require "fs"
 
+loadHooks = (floor) ->
+  try
+    require("#{__dirname}/Hooks/Floor#{floor.getId()}.js")(floor)
+  catch error
+    return
+
 class PreambleArena extends AscArena
 
   @getFileName: (floorId) -> return "#{__dirname}/Floors/Floor#{floorId}.json"
@@ -9,17 +15,19 @@ class PreambleArena extends AscArena
   constructor: ->
     super
 
-  load: ->
+  load: (hooks) ->
     @__floors.splice 0
     floorId = 1
     while true
-      break if not reloadFloor floorId++
+      break if not reloadFloor floorId++, false, hooks
 
-  reloadFloor: (id, create = false) ->
+  reloadFloor: (id, create = false, hooks = false) ->
     filename = @constructor.getFileName id
+    floor = null
     try
       json = JSON.parse fs.readFileSync(filename, "utf8")
-      @push Floor.fromJson(json)
+      floor = Floor.fromJson(json)
+      @push floor
       return true
     catch err
       return false if not create
@@ -27,6 +35,8 @@ class PreambleArena extends AscArena
       @push floor
       @saveFloorState id
       return true
+
+    loadHooks(floor) if hooks
 
   saveFloorState: (id) ->
     f = @get id
