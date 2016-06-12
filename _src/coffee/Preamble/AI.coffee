@@ -5,14 +5,11 @@ class AI extends Enum.GenericIdEntry
 
   constructor: (@__id, @__name, @__nameAbbr, @__level, @__kingdom, @__role) ->
     @__kingdomAbbr = (switch @__kingdom
-      when Kingdom.ARIA
-        "ARIA"
-      when Kingdom.DYRE
-        "DYRE"
-      when Kingdom.HELIX
-        "HLX"
-      when Kingdom.VACANT
-        "VCNT"
+      when Kingdom.ARIA then "ARIA"
+      when Kingdom.DYRE then "DYRE"
+      when Kingdom.ELODIA then "ELDA"
+      when Kingdom.HELIX then "HLX"
+      when Kingdom.VACANT then "VCNT"
     )
   getNameAbbr: -> @__nameAbbr
   getNameHtml: -> "<span class='ai-name-#{@__name.toLowerCase()}'>#{@__name}</span>"
