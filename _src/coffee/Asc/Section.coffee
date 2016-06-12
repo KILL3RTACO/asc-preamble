@@ -23,6 +23,7 @@ module.exports = class Section
       else {x: 0, y: 0}
 
   constructor: (@__floor, @__x, @__y, @__environment = @__floor.getEnvironment()) ->
+    @__movementCost = 1
     @__encounters = []
 
   getFloor: -> @__floor
@@ -33,8 +34,18 @@ module.exports = class Section
   getNeighbor: (dir) -> @__floor.getNeighborOf(@__x, @__y, dir)
   canMoveTo: (dir) -> @__floor.canMoveTo(@__x, @__y, dir)
 
+  setMovementCost: (cost) ->
+    @__movementCost = cost
+    return @
+  getMovementCost: -> @__movementCost
+
   toJson: ->
     floor: @__floor.getId()
     x: @__x
     y: @__y
     env: @__environment.getId()
+
+  toPathfinder: ->
+    {Node} = require "../Common/Pathfinder.js"
+    directions = (@canMoveTo(dir) for dir in @constructor.ALL_DIRECTIONS)
+    return new Node(@__x, @__y, directions, @__movementCost)

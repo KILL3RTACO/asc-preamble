@@ -82,6 +82,24 @@ module.exports = class Floor
         return accessible and (@canMoveTo(x, y, Section.DOWN) or @canMoveTo(x, y, Section.RIGHT))
       else return false
 
+  toPathfinder: ->
+    {Grid} = require "../Common/Pathfinder.js"
+    nodes = []
+    nodes[i] = s.toPathfinder() for s, i in @__sections when s isnt null and s isnt undefined
+    return new Grid(nodes, @__width, @__height)
+
+  findPath: (start, goal, pfOptions) ->
+    throw new Error("start must have a numeric x and y value") if typeof start.x isnt "number" and typeof start.y isnt "number"
+    throw new Error("goal must have a numeric x and y value") if typeof goal.x isnt "number" and typeof goal.y isnt "number"
+    Pathfinder = require "../Common/Pathfinder.js"
+    pfOptions = {} if typeof pfOptions isnt "object"
+    pfOptions.grid = @toPathfinder()
+
+    startNode = pfOptions.grid.get(start.x, start.y)
+    goalNode = pfOptions.grid.get(goal.x, goal.y)
+    return new Pathfinder(pfOptions).findPath(startNode, goalNode)
+
+
   # @OverrideMe
   getStartLocation: ->
     x: 0
