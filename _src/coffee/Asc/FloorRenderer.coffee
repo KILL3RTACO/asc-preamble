@@ -53,4 +53,4 @@ module.exports = class FloorRenderer extends MapRenderer
   findPathAndDraw: (start, goal, distanceFormula, color = "#FF7F00") ->
     path = @__floor.findPath start, goal, {distanceFormula} #CHEBYSHEV
     return null if path is null
-    @colorPathRaw path, color, @constructor.CURVED
+    @colorPathRaw path, color
