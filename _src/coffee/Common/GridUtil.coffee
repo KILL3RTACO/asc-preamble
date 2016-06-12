@@ -1,4 +1,4 @@
-module.exports = class GridUtil
+class GridUtil
 
   @toIndex: (x, y, w) -> return (w * y) + x
   @fromIndex: (index, w) -> return {x: index % w, y: index // w}
@@ -25,3 +25,8 @@ module.exports = class GridUtil
   @getTopRightDelta: -> {x: 1, y: -1}
   @getBottomLeftDelta: -> {x: -1, y: 1}
   @getBottomRightDelta: -> {x: 1, y: 1}
+
+if typeof module is "object" and typeof module.exports is "object"
+  module.exports = GridUtil
+else
+  window.GridUtil = GridUtil
