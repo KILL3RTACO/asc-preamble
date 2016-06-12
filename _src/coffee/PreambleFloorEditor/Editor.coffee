@@ -73,7 +73,7 @@ initGuiListeners = ->
   height.addListener wwt.event.Modify, sizeListener("__height")
 
   mapControl.getButton(0).addListener wwt.event.Selection, (e) -> util.clear(); util.save()
-  mapControl.getButton(0).addListener wwt.event.Selection, (e) -> util.reset(); util.save()
+  mapControl.getButton(1).addListener wwt.event.Selection, (e) -> util.reset(); util.save()
 
 module.exports =
 
