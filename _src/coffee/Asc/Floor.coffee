@@ -96,9 +96,10 @@ module.exports = class Floor
     pfOptions.grid = @toPathfinder()
 
     startNode = pfOptions.grid.get(start.x, start.y)
+    throw new Error("start node not equivalent not found") if startNode is null or startNode is undefined
     goalNode = pfOptions.grid.get(goal.x, goal.y)
+    throw new Error("goal node not equivalent not found") if goalNode is null or goalNode is undefined
     return new Pathfinder(pfOptions).findPath(startNode, goalNode)
-
 
   # @OverrideMe
   getStartLocation: ->
