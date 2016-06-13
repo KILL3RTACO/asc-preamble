@@ -9,6 +9,7 @@ module.exports = class Floor
   @fromJson: (json) ->
     floor = new Floor(json.id, json.name, Environment.getEnvironment(json.env), json.size.x, json.size.y)
     floor.push(Section.fromJson(s, floor)) for s in json.sections
+    floor.fillRemaining()
     return floor
 
   constructor: (@__id, @__name, @__environment = Environment.FLOOR_PLAINS, @__width = @constructor.DEF_W, @__height = @constructor.DEF_H) ->
@@ -27,7 +28,7 @@ module.exports = class Floor
       x: @__width
       y: @__height
     env: @__environment.getId()
-    sections: (s.toJson() for s in @__sections when s isnt null and s isnt undefined)
+    sections: (s.toJson() for s in @__sections when s isnt null and s isnt undefined and (s.getEnvironment() != @__environment or s.getMovementCost() != 1))
 
   push: (section) ->
     throw new Error("section.getFloor() and this don't match") if section.getFloor() isnt @
@@ -44,6 +45,11 @@ module.exports = class Floor
     section = new Section(this, x, y)
     @push section
     return section
+
+  fillRemaining: ->
+    for x in [0...@__width]
+      for y in [0...@__height]
+        @createSection(x, y) if @get(x, y) is null
 
   getNeighborOf: (x, y, dir) ->
     delta = Section.getDelta(dir)
