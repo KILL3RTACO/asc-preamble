@@ -218,7 +218,7 @@ class EditorUtil
       created = true
     return if not created and section.getEnvironment().getId() is currentEnv.getId()
     if paintEnv.getText() is "Default"
-      section.__environment = floor.getEnvironment()
+      section.__environment = @floor.getEnvironment()
     else
       section.__environment = currentEnv
     @save()
