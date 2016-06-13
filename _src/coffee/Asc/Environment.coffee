@@ -2,16 +2,16 @@ Enum = require "../Common/Enum.js"
 
 class Environment extends Enum.GenericIdEntry
 
-  constructor: (id, name, @__color, @__blacklist = []) ->
+  constructor: (id, name, @__color, @__list = [], @__black = true) ->
     super id, name
 
   getColor: -> @__color
 
   isAccessibleFrom: (environment) ->
-    return true if @__blacklist.length is 0 or (environment isnt null and environment.getId() is @__id)
-    return false if @__blacklist[0] is "*"
-    return false for name in @__blacklist when envs[name] is environment
-    return true
+    return true if @__black and @__list.length is 0 or (environment isnt null and environment isnt undefined and environment.getId() is @__id)
+    return false if @__black and @__list[0] is "*"
+    return not @__black for name in @__list when envs[name] is environment
+    return @__black
 
   # Environments 1-9 are floor environments
   isFloorEnvironment: -> return 1 <= @getId() <= 9
@@ -71,6 +71,6 @@ envs.__addValue("TOWN_PLAINS", new Environment(101, "Town (Plains)", "#999"))
 envs.__addValue("TOWN_SNOW", new Environment(102, "Town (Snow)", "#777"))
 
 # Water environments - 41-50
-envs.__addValue("WATER", new Environment(41, "Water", "#1c4587", ["*"]))
+envs.__addValue("WATER", new Environment(41, "Water", "#1c4587", ["WATER_DEEP"], false))
 envs.__addValue("WATER_CROSSING", new Environment(42, "Water Crossing", "#775900"))
-envs.__addValue("WATER_DEEP", new Environment(43, "Water (Deep)", "#20124d", ["*"]))
+envs.__addValue("WATER_DEEP", new Environment(43, "Water (Deep)", "#20124d", ["WATER"], false))
