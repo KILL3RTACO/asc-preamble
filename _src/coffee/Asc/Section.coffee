@@ -3,7 +3,7 @@
 
 module.exports = class Section
 
-  {@UP, @DOWN, @LEFT, @RIGHT, @TOP_LEFT, @TOP_RIGHT, @ALL_DIRECTIONS} = require("../Common/Pathfinder.js").Node
+  {@UP, @DOWN, @LEFT, @RIGHT, @TOP_LEFT, @TOP_RIGHT, @BOTTOM_LEFT, @BOTTOM_RIGHT, @ALL_DIRECTIONS} = require("../Common/Pathfinder.js").Node
   @CARDINAL_DIRECTIONS: [@UP, @DOWN, @LEFT, @RIGHT]
   @DIAGONAL_DIRECTIONS: [@TOP_LEFT, @TOP_RIGHT, @BOTTOM_LEFT, @BOTTOM_RIGHT]
 
