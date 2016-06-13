@@ -11,8 +11,11 @@ fs       = require "fs"
 # GUI - Widget Declaration
 env = floor = name = width = height = mapDataControl = paintOn = paintEnv = zoneId = pfControl = canvas = null
 
+getFloorEnvName = (name) -> name.substring("Floor (".length, name.length - 1)
+
 # util vars
 envNames = (e.getName() for e in Environment.values())
+floorEnvNames = (getFloorEnvName(e.getName()) for e in Environment.values() when e.isFloorEnvironment())
 util = null
 selected = null
 
@@ -20,7 +23,7 @@ selected = null
 initGui = ->
   mainContainer = new wwt.Composite("", "mainContainer")
 
-  env = new wwt.Combo(mainContainer, "environmentList").setItems(envNames).setText(Environment.FLOOR_PLAINS.getName())
+  env = new wwt.Combo(mainContainer, "environmentList").setItems(floorEnvNames)
   floor = new wwt.Combo(mainContainer, "floorList").setItems("Floor #{num}" for num in [1...100]).setText("Floor 1")
   name = new wwt.Text(mainContainer, "floorName").setPlaceholder("Floor Name")
 
@@ -177,7 +180,7 @@ class EditorUtil
 
   select: (id) ->
     (@getFloor(id)) if typeof id is "number"
-    env.setText(@floor.getEnvironment().getName())
+    env.setText(getFloorEnvName(@floor.getEnvironment().getName()))
     name.setText(@floor.getName())
     width.setValue(@floor.getWidth())
     height.setValue(@floor.getHeight())
