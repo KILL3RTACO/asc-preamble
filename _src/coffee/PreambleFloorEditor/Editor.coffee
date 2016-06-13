@@ -10,7 +10,7 @@ env = floor = name = width = height = mapDataControl = paintOn = paintEnv = zone
 getFloorEnvName = (name) -> name.substring("Floor (".length, name.length - 1)
 
 # util vars
-envNames = (e.getName() for e in Environment.values())
+envNames = (e.getName() for e in Environment.values() when not (e.isFloorEnvironment() or e.isTownEnvironment()))
 floorEnvNames = (getFloorEnvName(e.getName()) for e in Environment.values() when e.isFloorEnvironment())
 util = null
 selected = null
@@ -34,7 +34,7 @@ initGui = ->
   mainContainer.append("<br/>")
 
   paintOn = new wwt.Check(mainContainer, "paintOn").setText("Paint")
-  paintEnv = new wwt.Combo(mainContainer, "paintEnv").setItems(["Default", envNames...]).setText("Default")
+  paintEnv = new wwt.Combo(mainContainer, "paintEnv").setItems(["Default", "Town", envNames...])
 
   new wwt.Label(mainContainer, "pfControlLabel").setText("Pathfinder:")
   pfControl = new wwt.ButtonGroup(mainContainer, "pfControl")
@@ -54,7 +54,14 @@ initGui = ->
 # GUI - Listeners
 initGuiListeners = ->
   env.addListener wwt.event.Selection, (e) ->
-    util.floor.__environment = Environment.values()[e.index]
+    util.floor.__environment = Environment.getEnvironment(e.index + 1)
+    for s in util.floor.__sections
+      continue if s is null or s is undefined
+      if s.getEnvironment().isFloorEnvironment()
+        s.__environment = util.floor.getEnvironment()
+      else if s.getEnvironment().isTownEnvironment()
+        s.__environment = util.floor.getEnvironment().getTownEnvironment()
+    util.render()
     util.save()
 
   floor.addListener wwt.event.Selection, (e) ->
@@ -115,6 +122,10 @@ initGuiListeners = ->
     util.state.paint = e.state
     util.saveState()
 
+  paintEnv.addListener wwt.event.Selection, (e) ->
+    util.state.env = e.selection
+    util.saveState()
+
   $(canvas).mousedown (e) ->
     # If we are painting, edit the sections via paintEnv
     if paintOn.getState()
@@ -158,6 +169,7 @@ class EditorUtil
         paint: true
         pf: @pf ? @constructor.CLEAR_PF
         selected: null
+        env: "Default"
       @saveState()
   saveState: -> fs.writeFile @constructor.STATE_FILE, JSON.stringify(@state)
   materializeState: ->
@@ -171,6 +183,7 @@ class EditorUtil
 
     paintOn.setState(@state.paint)
     paintEnv.setEnabled(paintOn.getState())
+    paintEnv.setText(@state.env)
 
   clearPf: ->
     @pf = @constructor.CLEAR_PF
@@ -188,15 +201,28 @@ class EditorUtil
 
   paintCell: (e) ->
     currentCell = util.getCell e
-    currentEnv = Environment.getEnvironment(paintEnv.getText())
-    currentEnv ?= util.floor.getEnvironment()
-    section = util.floor.get(currentCell.x, currentCell.y)
+    if @lastPainted is null or @lastPainted is undefined or @lastPainted.x isnt currentCell.x or @lastPainted.y isnt currentCell.y
+      @lastPainted = currentCell
+    else
+      return
+
+    currentEnv = switch paintEnv.getText()
+      when "Default" then @floor.getEnvironment()
+      when "Town" then @floor.getEnvironment().getTownEnvironment()
+      else Environment.getEnvironment(paintEnv.getText())
+
+    console.log currentEnv
+
+    section = @floor.get(currentCell.x, currentCell.y)
     created = false
     if section is null
-      section = util.floor.createSection(currentCell.x, currentCell.y)
+      section = @floor.createSection(currentCell.x, currentCell.y)
       created = true
     return if not created and section.getEnvironment().getId() is currentEnv.getId()
-    section.__environment = currentEnv
+    if paintEnv.getText() is "Default"
+      section.__environment = floor.getEnvironment()
+    else
+      section.__environment = currentEnv
     @save()
     @render()
 
@@ -238,6 +264,7 @@ class EditorUtil
 
   clear: ->
     @floor.__sections.splice 0
+    @floor.fillRemaining()
     @render()
   reset: ->
     @clear()
