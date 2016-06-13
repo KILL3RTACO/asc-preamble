@@ -13,6 +13,9 @@ class Environment extends Enum.GenericIdEntry
     return false for name in @__blacklist when envs[name] is environment
     return true
 
+  # Environments 1-9 are floor environments
+  isFloorEnvironment: -> return 1 <= @getId() <= 9
+
 class EnvironmentEnum extends Enum
 
   constructor: ->
