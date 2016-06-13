@@ -211,8 +211,6 @@ class EditorUtil
       when "Town" then @floor.getEnvironment().getTownEnvironment()
       else Environment.getEnvironment(paintEnv.getText())
 
-    console.log currentEnv
-
     section = @floor.get(currentCell.x, currentCell.y)
     created = false
     if section is null
