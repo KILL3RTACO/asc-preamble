@@ -15,6 +15,19 @@ class Environment extends Enum.GenericIdEntry
 
   # Environments 1-9 are floor environments
   isFloorEnvironment: -> return 1 <= @getId() <= 9
+  isTownEnvironment: -> return 101 <= @getId() <= 109
+
+  getFloorEnvironment: ->
+    switch this
+      when envs.TOWN_PLAINS then return envs.FLOOR_PLAINS
+      when envs.TOWN_SNOW then return envs.FLOOR_SNOW
+      else return this
+
+  getTownEnvironment: ->
+    switch this
+      when envs.FLOOR_PLAINS then return envs.TOWN_PLAINS
+      when envs.FLOOR_SNOW then return envs.TOWN_SNOW
+      else return this
 
 class EnvironmentEnum extends Enum
 
@@ -32,6 +45,8 @@ class EnvironmentEnum extends Enum
     return null if env is null or env is undefined
     return env
 
+  getTownEnvironment: (id) -> return @getEnvironment(100 + id)
+
 module.exports = envs = new EnvironmentEnum()
 
 # Void - id 0
@@ -39,6 +54,7 @@ envs.__addValue("VOID", new Environment(0, "Void", "#000", ["*"]))
 
 # Floor environment types - ids 1-9
 envs.__addValue("FLOOR_PLAINS", new Environment(1, "Floor (Plains)", "#003e00"))
+envs.__addValue("FLOOR_SNOW", new Environment(2, "Floor (Snow)", "#ccc"))
 
 # Forest environments - ids 21 - 30
 envs.__addValue("FOREST", new Environment(21, "Forest", "#38761d", ["*"]))
@@ -52,6 +68,7 @@ envs.__addValue("MTN_PATH", new Environment(33, "Mountain Path", "#906c00", ["MT
 
 # Town types, id = 100 + (corresponding floor type id)
 envs.__addValue("TOWN_PLAINS", new Environment(101, "Town (Plains)", "#999"))
+envs.__addValue("TOWN_SNOW", new Environment(102, "Town (Snow)", "#777"))
 
 # Water environments - 41-50
 envs.__addValue("WATER", new Environment(41, "Water", "#1c4587", ["*"]))
