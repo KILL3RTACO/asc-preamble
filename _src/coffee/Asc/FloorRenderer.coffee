@@ -1,7 +1,5 @@
-Section       = require "./Section.js"
-PreambleArea = require "../Preamble/PreambleArea.js"
-MapRenderer  = require "../Common/MapRenderer.js"
-GridUtil     = require "../Common/GridUtil.js"
+{Section} = require "../asc"
+{MapRenderer, GridUtil} = require "../common"
 
 {TOP, BOTTOM, LEFT, RIGHT} = MapRenderer
 

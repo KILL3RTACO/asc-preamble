@@ -1,5 +1,5 @@
-AscWeapon = require "./Weapon.js"
-Enum      = require "../Common/Enum.js"
+{Weapon} = require "../asc"
+{Enum} = require "../common"
 
 Character = class module.exports
 
@@ -27,12 +27,12 @@ class CType extends Enum.GenericEntry
     str += @__weaponTypes[@__weaponTypes.length - 1].getName()
 
 Character.ClassificationType = ctypes = new Enum()
-ctypes.__addValue("AURORA", new CType("Aurora", [AscWeapon.Type.SWORD]))
-ctypes.__addValue("GOLEM", new CType("Golem", [AscWeapon.Type.MINIGUN, AscWeapon.Type.ROCKET_LAUNCHER, AscWeapon.Type.AUTOMATIC_RIFLE, AscWeapon.Type.MARKSMAN_RIFLE]))
-ctypes.__addValue("SALAMANDER", new CType("Salamander", [AscWeapon.Type.SHOTGUN, AscWeapon.Type.AUTOMATIC_RIFLE]))
-ctypes.__addValue("SHADOWBORNE", new CType("Shadowborne", [AscWeapon.Type.SNIPER_RIFLE]))
-ctypes.__addValue("XARYA", new CType("Xarya", [AscWeapon.Type.AUTOMATIC_RIFLE, AscWeapon.Type.MARKSMAN_RIFLE]))
-ctypes.__addValue("ZEPHYR", new CType("Zephyr", [AscWeapon.Type.MARKSMAN_RIFLE, AscWeapon.Type.AUTOMATIC_RIFLE]))
+ctypes.__addValue("AURORA", new CType("Aurora", [Weapon.Type.SWORD]))
+ctypes.__addValue("GOLEM", new CType("Golem", [Weapon.Type.MINIGUN, Weapon.Type.ROCKET_LAUNCHER, Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
+ctypes.__addValue("SALAMANDER", new CType("Salamander", [Weapon.Type.SHOTGUN, Weapon.Type.AUTOMATIC_RIFLE]))
+ctypes.__addValue("SHADOWBORNE", new CType("Shadowborne", [Weapon.Type.SNIPER_RIFLE]))
+ctypes.__addValue("XARYA", new CType("Xarya", [Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
+ctypes.__addValue("ZEPHYR", new CType("Zephyr", [Weapon.Type.MARKSMAN_RIFLE, Weapon.Type.AUTOMATIC_RIFLE]))
 
 Character.Gender = g = new Enum()
 g.__addValue("MALE", new Enum.GenericEntry("Male"))

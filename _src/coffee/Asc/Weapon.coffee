@@ -1,5 +1,4 @@
-Enum = require "../Common/Enum.js"
-Util = require "../Common/Util.js"
+{Enum, Util} = require "../common"
 
 Weapon = class module.exports
 

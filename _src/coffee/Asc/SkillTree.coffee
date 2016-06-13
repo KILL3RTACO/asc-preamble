@@ -1,4 +1,4 @@
-Util = require "../Common/Util.js"
+{Util} = require "../common"
 
 class module.exports
 

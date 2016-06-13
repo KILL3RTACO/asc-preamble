@@ -1,9 +1,5 @@
 # Asc
-Environment   = require "../Asc/Environment.js"
-FloorRenderer = require "../Asc/FloorRenderer.js"
-
-# Preamble
-Preamble = require "../preamble.js"
+{Environment, FloorRenderer} = require "../asc"
 
 # Node
 fs       = require "fs"
@@ -166,7 +162,6 @@ class EditorUtil
   saveState: -> fs.writeFile @constructor.STATE_FILE, JSON.stringify(@state)
   materializeState: ->
     @pf = @state.pf
-    console.log @pf
     @updatePathfinderControl()
 
     @selectSection(@state.selected)

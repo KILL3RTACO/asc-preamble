@@ -1,6 +1,5 @@
-Section     = require "./Section.js"
-GridUtil    = require "../Common/GridUtil.js"
-Environment = require "./Environment.js"
+{Environment, Section} = require "../asc"
+{GridUtil} = require "../common"
 
 module.exports = class Floor
 

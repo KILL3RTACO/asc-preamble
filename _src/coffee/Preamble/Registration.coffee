@@ -1,8 +1,7 @@
-Journey   = require "../journey.js"
-Player    = require "../Asc/Player.js"
-AscWeapon = require "../Asc/Weapon.js"
-Preamble  = require "../preamble.js"
-AI        = require "./AI.js"
+Journey          = require "../journey"
+{Player, Weapon} = require "../asc"
+Preamble         = require "../preamble"
+{AI}             = Preamble
 
 NAME           = ""
 CLASSIFICATION = null
@@ -74,7 +73,7 @@ module.exports =
     gender.addListener wwt.event.Selection, (event) -> GENDER = Player.Gender.values()[event.index]
     kingdom.addListener wwt.event.Selection, (event) -> KINGDOM = Player.Kingdom.values()[event.index]
     weapon.addListener wwt.event.Selection, (event) ->
-      WEAPON = AscWeapon.Type.values()[event.index]
+      WEAPON = Weapon.Type.values()[event.index]
       weaponChosen = true
 
     cancel.setEnabled().setText("Cancel").addListener wwt.event.Selection, -> Preamble.mainMenu()

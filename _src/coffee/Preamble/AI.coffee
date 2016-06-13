@@ -1,5 +1,5 @@
-Enum    = require "../Common/Enum.js"
-Kingdom = require("../Asc/Character").Kingdom
+{Enum} = require "../common"
+{Kingdom} = require("../asc").Player.Kingdom
 
 class AI extends Enum.GenericIdEntry
 

@@ -1,4 +1,4 @@
-Floor = require "./Floor.js"
+{Floor} = require "../asc"
 
 module.exports = class AscArena
 

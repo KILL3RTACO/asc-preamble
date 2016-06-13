@@ -1,5 +1,4 @@
-AscArena = require "../Asc/AscArena.js"
-Floor    = require "../Asc/Floor.js"
+{Arena, Floor} = require "../asc"
 fs       = require "fs"
 
 loadHooks = (floor) ->
@@ -8,7 +7,7 @@ loadHooks = (floor) ->
   catch error
     return
 
-class PreambleArena extends AscArena
+class PreambleArena extends Arena
 
   @getFileName: (floorId) -> return "#{__dirname}/Floors/Floor#{floorId}.json"
 
