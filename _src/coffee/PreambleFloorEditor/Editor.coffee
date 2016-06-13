@@ -24,7 +24,7 @@ initGui = ->
   mainContainer = new wwt.Composite("", "mainContainer")
 
   env = new wwt.Combo(mainContainer, "environmentList").setItems(floorEnvNames)
-  floor = new wwt.Combo(mainContainer, "floorList").setItems("Floor #{num}" for num in [1...100]).setText("Floor 1")
+  floor = new wwt.Combo(mainContainer, "floorList").setItems("Floor #{num}" for num in [1...100])
   name = new wwt.Text(mainContainer, "floorName").setPlaceholder("Floor Name")
 
   new wwt.Label(mainContainer, "floorSizeLabel").setText("Size:")
@@ -37,8 +37,8 @@ initGui = ->
 
   mainContainer.append("<br/>")
 
-  paintOn = new wwt.Check(mainContainer, "paintOn").setText("Paint").setState(true)
-  paintEnv = new wwt.Combo(mainContainer, "paintEnv").setItems(["Default", envNames...]).setText("Default").setEnabled(paintOn.getState())
+  paintOn = new wwt.Check(mainContainer, "paintOn").setText("Paint")
+  paintEnv = new wwt.Combo(mainContainer, "paintEnv").setItems(["Default", envNames...]).setText("Default")
 
   new wwt.Label(mainContainer, "pfControlLabel").setText("Pathfinder:")
   pfControl = new wwt.ButtonGroup(mainContainer, "pfControl")
@@ -53,6 +53,7 @@ initGui = ->
   canvas = $("#mrCanvas")[0]
 
   util = new EditorUtil()
+  util.materializeState()
 
 # GUI - Listeners
 initGuiListeners = ->
@@ -60,7 +61,11 @@ initGuiListeners = ->
     util.floor.__environment = Environment.values()[e.index]
     util.save()
 
-  floor.addListener wwt.event.Selection, (e) -> util.reloadAndSelect(e.index + 1)
+  floor.addListener wwt.event.Selection, (e) ->
+    util.clearPf()
+    util.reloadAndSelect(e.index + 1)
+    util.state.floor = e.index + 1
+    util.saveState()
 
   name.addListener wwt.event.Modify, (e) ->
     util.floor.__name = e.value
@@ -81,20 +86,25 @@ initGuiListeners = ->
   pfListener = (prop) ->
     return () ->
       util.pf[prop] = util.selected
-      pfControl.getButton(2).setEnabled(util.pf.start isnt null or util.pf.goal isnt null)
-      pfControl.getButton(3).setEnabled(util.pf.start isnt null and util.pf.goal isnt null)
+      util.updatePathfinderControl()
       util.selectSection null
       util.render()
+      util.state.pf = util.pf
+      util.saveState()
   pfControl.getButton(0).addListener wwt.event.Selection, pfListener("start")
   pfControl.getButton(1).addListener wwt.event.Selection, pfListener("goal")
   pfControl.getButton(2).addListener wwt.event.Selection, ->
     util.clearPf()
     util.selectSection null
     util.render()
-    @setEnabled false
-    pfControl.getButton(3).setEnabled(false)
+    util.updatePathfinderControl()
   pfControl.getButton(3).addListener wwt.event.Selection, ->
-    path = util.floor.findPath(util.pf.start, util.pf.goal)
+    path = null
+    try
+      path = util.floor.findPath(util.pf.start, util.pf.goal)
+    catch error
+      alert(error)
+      return
 
     if path is null
       alert("Pathfinder Error - Could not find a path")
@@ -106,6 +116,8 @@ initGuiListeners = ->
     util.selectSection null
     util.render()
     paintEnv.setEnabled e.state
+    util.state.paint = e.state
+    util.saveState()
 
   $(canvas).mousedown (e) ->
     # If we are painting, edit the sections via paintEnv
@@ -116,12 +128,11 @@ initGuiListeners = ->
       $(this).mousemove (e) -> util.paintCell e
       $(this).mouseup -> $(this).off "mousemove"
 
-
     # Otherwise, select(mark) the clicked cell
     else
       util.selectSection util.getCell(e)
       util.render()
-      util.fr.colorMarkerRaw util.selected.x, util.selected.y, "orange"
+      util.saveState()
 
 module.exports =
 
@@ -134,18 +145,47 @@ module.exports =
 class EditorUtil
 
   @CLEAR_PF: {start: null, goal: null}
+  @STATE_FILE: "#{__dirname}/EditorState.json"
 
   constructor: ->
-    @clearPf()
+    @loadState()
     @arena = require "../Preamble/PreambleArena.js"
-    @selected = null
     @fr = new FloorRenderer()
     @fr.setCanvas canvas
-    @reloadAndSelect 1
+
+  loadState: ->
+    try
+      @state = JSON.parse(fs.readFileSync(@constructor.STATE_FILE, "utf8"))
+    catch error
+      @state =
+        floor: 1
+        paint: true
+        pf: @pf ? @constructor.CLEAR_PF
+        selected: null
+      @saveState()
+  saveState: -> fs.writeFile @constructor.STATE_FILE, JSON.stringify(@state)
+  materializeState: ->
+    @pf = @state.pf
+    console.log @pf
+    @updatePathfinderControl()
+
+    @selectSection(@state.selected)
+
+    floor.setText("Floor #{@state.floor}")
+    @reloadAndSelect(@state.floor)
+
+    paintOn.setState(@state.paint)
+    paintEnv.setEnabled(paintOn.getState())
 
   clearPf: ->
     @pf = @constructor.CLEAR_PF
+    @state.pf = @constructor.CLEAR_PF
+    @saveState()
     return @
+
+  updatePathfinderControl: ->
+    pfControl.getButton(2).setEnabled(@pf.start isnt null or @pf.goal isnt null)
+    pfControl.getButton(3).setEnabled(@pf.start isnt null and @pf.goal isnt null)
 
   getCell: (e) ->
     pos = $(canvas).offset()
@@ -172,9 +212,12 @@ class EditorUtil
       @fr.colorMarkerRaw @pf.start.x, @pf.start.y, "#0F0"
     if @pf.goal
       @fr.colorMarkerRaw @pf.goal.x, @pf.goal.y, "#F00"
+    if @selected
+      util.fr.colorMarkerRaw @selected.x, @selected.y, "orange"
 
   selectSection: (section) ->
     @selected = section
+    @state.selected = section
     pfControl.getButton(0).setEnabled(section isnt null)
     pfControl.getButton(1).setEnabled(section isnt null)
 
