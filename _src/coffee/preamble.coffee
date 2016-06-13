@@ -1,6 +1,5 @@
 Journey      = require "./journey.js"
-AscCharacter = require "./Asc/Character.js"
-MapRenderer  = require "./Preamble/MapRenderer.js"
+{Player}     = require "../asc"
 fs           = require "fs"
 
 PreambleArena = null
@@ -49,7 +48,7 @@ module.exports =
       kingdom = PreambleRegistration.getKingdom()
       gender = PreambleRegistration.getGender()
       weaponType = PreambleRegistration.getWeaponType()
-      @Character = new AscCharacter(name, gender, classification, kingdom)
+      @Player = new Player(name, gender, classification, kingdom)
       @Data = {}
       floor = PreambleArena.getFloor(1)
       start = floor.getStartLocation() # {x, y}
@@ -94,5 +93,13 @@ module.exports =
   left: -> __move -1, 0
   right: -> __move 1, 0
 
-  getFloorFromData: (data, colorData) ->
-    
+clazzes =
+  AI: ""
+  Arena: "PreambleArena"
+  Registration: ""
+
+for k, v of classes
+  file = "./Preamble/#{if v.length is 0 then k else v}"
+  fn = (f) -> return () ->
+    require f
+  Object.defineProperty(Preamble, k, {enumerable: true, get: fn(file)})
