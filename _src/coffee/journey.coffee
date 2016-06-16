@@ -94,15 +94,14 @@
     # First Row
     bg1 = new wwt.ButtonGroup(systemControlsContainer, "JourneySystemControls1")
     mainMenu = bg1.addButton("JourneySystemMainMenu").setText(glyphicon "menu-hamburger").setTooltip("Main Menu").setEnabled(false)
-    newGame = bg1.addButton("JourneySystemNewGame").setText(glyphicon "edit").setTooltip("New Game").setEnabled(false)
     settings = bg1.addButton("JourneySystemSettings").setText(glyphicon "cog").setTooltip("Settings").setEnabled(false)
     user = bg1.addButton("JourneySystemUser").setText(glyphicon "user").setTooltip("User").setEnabled(false)
 
     # Second Row
     bg2 = new wwt.ButtonGroup(systemControlsContainer, "JourneySystemControls2")
+    newGame = bg2.addButton("JourneySystemNewGame").setText(glyphicon "edit").setTooltip("New Game").setEnabled(false)
     loadGame = bg2.addButton("JourneySystemLoadGame").setText(glyphicon "folder-open").setTooltip("Load Game").setEnabled(false)
     saveGame = bg2.addButton("JourneySystemSaveGame").setText(glyphicon "floppy-disk").setTooltip("Save Game").setEnabled(false).setEnabled(false)
-    quicksaveGame = bg2.addButton("JourneySystemQuicksave").setText(glyphicon "floppy-save").setTooltip("Quicksave").setEnabled(false)
 
     # Nothing is done for the right side, it is modified at the game's discretion
 
@@ -144,7 +143,6 @@
     return settings if control is "settings"
     return loadGame if control is "load-game"
     return saveGame if control is "save-game"
-    return quicksaveGame if control is "quicksave"
     return user if control is "user"
 
   root.getMainContent = -> mainContent
@@ -159,4 +157,7 @@
     root.clearContent()
     root.clearRightContent() if rightContent
     root.resetButtons()
+    root.setPlaceTitle ""
+    root.setPlaceLine1 ""
+    root.setPlaceLine2 ""
 )

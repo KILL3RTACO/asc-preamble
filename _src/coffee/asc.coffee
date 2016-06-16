@@ -7,6 +7,7 @@ classes =
   Player: ""
   Section: ""
   SkillTree: ""
+  Town: ""
   Weapon: ""
 
 module.exports = class Asc

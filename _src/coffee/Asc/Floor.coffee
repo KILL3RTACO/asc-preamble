@@ -1,5 +1,5 @@
-{Environment, Section} = require "../asc"
-{GridUtil} = require "../common"
+{Environment, Section, Town} = require "../asc"
+{GridUtil}                   = require "../common"
 
 module.exports = class Floor
 
@@ -14,6 +14,7 @@ module.exports = class Floor
 
   constructor: (@__id, @__name, @__environment = Environment.FLOOR_PLAINS, @__width = @constructor.DEF_W, @__height = @constructor.DEF_H) ->
     @__sections = []
+    @__towns = []
 
   getId: -> @__id
   getName: -> @__name
@@ -30,8 +31,17 @@ module.exports = class Floor
     env: @__environment.getId()
     sections: (s.toJson() for s in @__sections when s isnt null and s isnt undefined and (s.getEnvironment() != @__environment or s.getMovementCost() != 1))
 
+  addTown: (name, sections = []) ->
+    town = new Town(this, name)
+    town.push sections
+    @__towns.push town
+    return town
+  getTown: (id) -> return @__towns[id - 1]
+  getTowns: -> @__towns.slice 0
+  getTownSize: -> @__towns.length
+
   push: (section) ->
-    throw new Error("section.getFloor() and this don't match") if section.getFloor() isnt @
+    throw new Error("section.getFloor() and this don't match") if section.getFloor().getId() isnt @__id
     return if GridUtil.isOutOfBounds section.getX(), section.getY(), @__width, @__height
     @__sections[GridUtil.toIndex section.getX(), section.getY(), @getWidth()] = section
     return @
@@ -106,7 +116,7 @@ module.exports = class Floor
     throw new Error("goal node not equivalent not found") if goalNode is null or goalNode is undefined
     return new Pathfinder(pfOptions).findPath(startNode, goalNode)
 
-  # @OverrideMe
-  getStartLocation: ->
-    x: 0
-    y: 0
+  setStartLocation: (start) ->
+    return if typeof start isnt "object"
+    @__startLocation = if start instanceof Section then start else @get(start.x, start.y)
+  getStartLocation: -> @__startLocation

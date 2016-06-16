@@ -1,19 +1,42 @@
-{Weapon} = require "../asc"
-{Enum} = require "../common"
+Journey           = require "../journey"
+{Section, Weapon} = require "../asc"
+{Enum}            = require "../common"
 
-Character = class module.exports
+module.exports = class Player
 
-  constructor: (name, gender, classification, kingdom) ->
-    wwt.validateString "name", name
-    @__name = name
-    @__gender = gender
-    @__classification = classification
-    @__kingdom = kingdom
+  @fromJson: (json, arena) ->
+    player = new Player(json.name, json.gender, json.classification, json.kingdom)
+    player.__location = arena.get(json.location.floor).get(json.location.x, json.location.y)
+
+  constructor: (@__name, @__gender, @__classification, @__kingdom) ->
 
   getName: -> @__name
   getGender: -> @__gender
   getClassification: -> @__classification
   getHailingKingdom: -> @__kingdom
+
+  getLocation: -> @__location
+  setLocation: (section) ->
+    @__location = section
+    return @
+
+  isInTown: -> @__location.getEnvironment().isTownEnvironment()
+
+  canMove: (dir) -> return @__location.canMoveTo dir
+  move: (dir) ->
+    section = @__location.getNeighbor dir
+    throw new Error("Neighbor from move result cannot be null (dir: #{dir})")
+    @setLocation section
+
+  toJson: ->
+    name: @__name
+    gender: @__gender
+    classification: @__classification
+    kingdom: @__kingdom
+    location:
+      floor: @__location.getFloor().getId()
+      x: @__locaton.getX()
+      y: @__locaton.getY()
 
 class CType extends Enum.GenericEntry
 
@@ -26,7 +49,7 @@ class CType extends Enum.GenericEntry
     str += "#{@__weaponTypes[i].getName()} or " for i in [0...@__weaponTypes.length - 1]
     str += @__weaponTypes[@__weaponTypes.length - 1].getName()
 
-Character.ClassificationType = ctypes = new Enum()
+Player.ClassificationType = ctypes = new Enum()
 ctypes.__addValue("AURORA", new CType("Aurora", [Weapon.Type.SWORD]))
 ctypes.__addValue("GOLEM", new CType("Golem", [Weapon.Type.MINIGUN, Weapon.Type.ROCKET_LAUNCHER, Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
 ctypes.__addValue("SALAMANDER", new CType("Salamander", [Weapon.Type.SHOTGUN, Weapon.Type.AUTOMATIC_RIFLE]))
@@ -34,12 +57,12 @@ ctypes.__addValue("SHADOWBORNE", new CType("Shadowborne", [Weapon.Type.SNIPER_RI
 ctypes.__addValue("XARYA", new CType("Xarya", [Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
 ctypes.__addValue("ZEPHYR", new CType("Zephyr", [Weapon.Type.MARKSMAN_RIFLE, Weapon.Type.AUTOMATIC_RIFLE]))
 
-Character.Gender = g = new Enum()
+Player.Gender = g = new Enum()
 g.__addValue("MALE", new Enum.GenericEntry("Male"))
 g.__addValue("FEMALE", new Enum.GenericEntry("Female"))
 g.__addValue("OTHER", new Enum.GenericEntry("Other"))
 
-Character.Kingdom = k = new Enum()
+Player.Kingdom = k = new Enum()
 k.__addValue("ARIA", new Enum.GenericIdEntry(1, "Aria"))
 k.__addValue("DYRE", new Enum.GenericIdEntry(2, "Dyre"))
 k.__addValue("ELODIA", new Enum.GenericIdEntry(3, "Elodia"))

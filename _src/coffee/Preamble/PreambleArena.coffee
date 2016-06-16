@@ -1,10 +1,15 @@
-{Arena, Floor} = require "../asc"
-fs       = require "fs"
+Preamble       = require "../preamble"
+Asc            = require "../asc"
+{Arena, Floor} = Asc
+fs             = require "fs"
 
 loadHooks = (floor) ->
   try
-    require("#{__dirname}/Hooks/Floor#{floor.getId()}.js")(floor)
+    console.log "Preamble: Loading FloorHooks for [#{floor.getId()}]"
+    require("#{__dirname}/Hooks/Floor#{floor.getId()}.js")(Asc, Preamble, floor)
   catch error
+    console.error "Preamble: Could not load hooks: #{floor.getId()}"
+    console.error error
     return
 
 class PreambleArena extends Arena
@@ -20,6 +25,10 @@ class PreambleArena extends Arena
     while true
       break if not reloadFloor floorId++, false, hooks
 
+  loadIfUnloaded: (id, hooks = true) ->
+    return if @get(id) isnt null
+    @reloadFloor(id, false, hooks)
+
   reloadFloor: (id, create = false, hooks = false) ->
     filename = @constructor.getFileName id
     floor = null
@@ -27,15 +36,14 @@ class PreambleArena extends Arena
       json = JSON.parse fs.readFileSync(filename, "utf8")
       floor = Floor.fromJson(json)
       @push floor
-      return true
     catch err
       return false if not create
       floor = new Floor(id, "")
       @push floor
       @saveFloorState id
-      return true
 
     loadHooks(floor) if hooks
+    return true
 
   saveFloorState: (id) ->
     f = @get id

@@ -1,5 +1,6 @@
 Journey      = require "./journey.js"
-{Player}     = require "../asc"
+Asc          = require "./asc"
+{Player}     = Asc
 fs           = require "fs"
 
 PreambleArena = null
@@ -8,15 +9,12 @@ specialThanks = null
 
 hasBeenInit = false
 
-selectFile = (title) ->
-  return require("electron").remote.dialog.openSaveDialog null, {
-    title: "Choose Save Location"
-    filters: [{name: "JSON File", extensions: ["json"]}]
-  }
+FILE = null
+PLAYER = null
 
-module.exports =
+module.exports = class Preamble
 
-  init: ->
+  @init: ->
     return if hasBeenInit
     Journey.init()
     $("head").append "<link rel='stylesheet' href='./css/preamble.css'>"
@@ -32,68 +30,105 @@ module.exports =
     specialThanks = fs.readFileSync("#{__dirname}/../special-thanks.html", "UTF-8")
 
     Journey.getSystemControl("main-menu").addListener wwt.event.Selection, => @mainMenu()
-    Journey.getSystemControl("new-game").addListener wwt.event.Selection, => @newGame()
-    Journey.getSystemControl("save-game").addListener wwt.event.Selection, => @save()
-    Journey.getSystemControl("quicksave").addListener wwt.event.Selection, => @quicksave()
     Journey.getSystemControl("settings").addListener wwt.event.Selection, => @settings()
     Journey.getSystemControl("user").addListener wwt.event.Selection, => @user()
+    Journey.getSystemControl("new-game").addListener wwt.event.Selection, => @newGame()
+    Journey.getSystemControl("save-game").addListener wwt.event.Selection, => @save()
+    Journey.getSystemControl("load-game").addListener wwt.event.Selection, => @loadScreen()
 
     hasBeenInit = true
-    @mainMenu()
+    Preamble.mainMenu()
+    Preamble.newGame()
 
-  newGame: ->
+  @newGame: ->
     PreambleRegistration.done ->
+      PreambleArena.loadIfUnloaded 1
       name = PreambleRegistration.getName()
       classification = PreambleRegistration.getClassification()
       kingdom = PreambleRegistration.getKingdom()
       gender = PreambleRegistration.getGender()
       weaponType = PreambleRegistration.getWeaponType()
-      @Player = new Player(name, gender, classification, kingdom)
-      @Data = {}
-      floor = PreambleArena.getFloor(1)
-      start = floor.getStartLocation() # {x, y}
-      setCharacterLocation floor, start.x, start.y
+      PLAYER = new Player(name, gender, classification, kingdom)
+      FILE = Preamble.getSaveFile name.toLowerCase().replace(/[\s+_]/, "-")
+      PLAYER.setLocation(PreambleArena.get(1).getStartLocation())
+      Preamble.updatePlayer()
 
     PreambleRegistration.start()
 
-  mainMenu: ->
+  @mainMenu: ->
     Journey.reset()
-    Journey.getButton(4, 0).setEnabled().setText("Special Thanks").addListener wwt.event.Selection, =>
+    Journey.getButton(4, 0).setEnabled().setText("Special Thanks").addListener wwt.event.Selection, ->
       Journey.reset()
-      Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, => @mainMenu()
+      Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, -> Preamble.mainMenu()
       Journey.getMainContent().append specialThanks
-    Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, => @newGame()
+    Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, -> Preamble.newGame()
 
-  quicksave: -> @__saveAt @__lastFile
+  @load: (file) ->
+    PFILE = file
+    json = JSON.parse(fs.readFileSync file)
+    PLAYER = Player.fromJson json.player
 
-  save: ->
-    filename = selectFile()
-    @__saveAt filename
+  @loadScreen: ->
 
-  __saveAt: (file) ->
-    fs.writeFileSync filename, JSON.stringify @Data
-    @__lastFile = filename
+  @getSaveFileName: (name) -> "#{__dirname}/Preamble/Saves/#{name}.json"
 
-  load: ->
-    file = selectFile()
-    @Data = JSON.parse fs.readFileSync(file, "UTF-8")
-    @__lastFile = file
+  @getSaveFile: (name) ->
+    num = ""
+    while true
+      fullname = Preamble.getSaveFileName(name + num)
+      try
+        fs.accessSync fullname
+        num = if num.length is 0 then 1 else num + 1
+      catch
+        return Preamble.getSaveFileName fullname
 
-  setCharacterLocation: (floor, x, y) ->
-    @Data.location = {floor: floor ? @Data.location.floor, x, y}
+  @save: (file = @__file) ->
+    json = {}
+    json.player = PLAYER.toJson()
+    fs.writeFileSync FILE, JSON.stringify(json)
+
+  @addMovementButtons: (resetButtons = false) ->
+    Journey.resetButtons() if resetButtons
+    buttons = [] # This array is compatible with Section.UP, DOWN, etc..
+    buttons.push Journey.getButton(1, 0).setText("North")
+    buttons.push Journey.getButton(1, 2).setText("South")
+    buttons.push Journey.getButton(2, 1).setText("West")
+    buttons.push Journey.getButton(0, 1).setText("East")
+    buttons.push Journey.getButton(0, 0).setText("Northwest")
+    buttons.push Journey.getButton(2, 0).setText("Northeast")
+    buttons.push Journey.getButton(0, 2).setText("Southwest")
+    buttons.push Journey.getButton(2, 2).setText("Southeast")
+    buttons.push Journey.getButton(1, 1).setText("Explore")
+
+    return buttons
+
+  @enableMovement: (buttons) ->
+    dirs = Asc.Section.ALL_DIRECTIONS
+    for d in dirs
+      do (d) ->
+        b = buttons[d]
+        b.setEnabled(PLAYER.canMove(d))
+        if b.isEnabled()
+          b.addListener wwt.event.Selection, => PLAYER.move d
+
+    explore = buttons[dirs.length]
+    location = PLAYER.getLocation()
+    explore.setEnabled(location.getEncounterSize() > 0)
+    if explore.isEnabled()
+      explore.addListener wwt.event.Selection, ->
+        location.randomEncounter().run()
+
+  @updatePlayer: (lookForEncounter = true) ->
+    Journey.reset()
+    encounter = if lookForEncounter then PLAYER.getLocation().randomEncounter() else null
+    if encounter is null # Section has no encounter or disabled
+      Preamble.enableMovement Preamble.addMovementButtons()
+    else
+      encounter.run()
+
     return @
-  getCharacterLocation: -> @Data.location
-  getCharacterArea: -> @Data.location.floor.getArea @Data.location.x, @Data.location.y
 
-  __move:  (deltaX, deltaY) ->
-    @setCharacterLocation @Data.location.floor, @Data.location.x + deltaX, @Data.location.y + deltaY
-    return @
-  up: -> __move 0, -1
-  down: -> __move 0, 1
-  left: -> __move -1, 0
-  right: -> __move 1, 0
-
-clazzes =
+classes =
   AI: ""
   Arena: "PreambleArena"
   Registration: ""

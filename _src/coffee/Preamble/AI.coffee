@@ -1,5 +1,5 @@
 {Enum} = require "../common"
-{Kingdom} = require("../asc").Player.Kingdom
+{Kingdom} = require("../asc").Player
 
 class AI extends Enum.GenericIdEntry
 
@@ -8,7 +8,7 @@ class AI extends Enum.GenericIdEntry
       when Kingdom.ARIA then "ARIA"
       when Kingdom.DYRE then "DYRE"
       when Kingdom.ELODIA then "ELDA"
-      when Kingdom.HELIX then "HLX"
+      when Kingdom.HELIX then "HELX"
       when Kingdom.VACANT then "VCNT"
     )
   getNameAbbr: -> @__nameAbbr

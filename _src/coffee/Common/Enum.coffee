@@ -10,12 +10,12 @@ class Enum
 
   values: -> @__values.slice 0
 
-Enum.GenericEntry = class
+class Enum.GenericEntry
 
     constructor: (@__name) ->
     getName: -> @__name
 
-Enum.GenericIdEntry = class extends Enum.GenericEntry
+class Enum.GenericIdEntry extends Enum.GenericEntry
   constructor: (@__id, @__name) ->
   getId: -> @__id
 

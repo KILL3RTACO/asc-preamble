@@ -3,9 +3,10 @@
     <script>window.$ = window.jQuery = require("./js/jquery.min.js")</script>
     <script src="./js/spectrum.js"></script>
     <link rel="stylesheet" href="./css/spectrum.css"></script>
+    <script>require("devtron").install()</script>
     <script>window.wwt = require("./js/wwt.js"); wwt.Options.setResourceBase(".")</script>
     <script>
-      var edit = true;
+      var edit = false;
 
       $(document).ready(function(){
         if(edit)
