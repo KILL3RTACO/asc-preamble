@@ -51,6 +51,7 @@ module.exports = class Preamble
       PLAYER = new Player(name, gender, classification, kingdom)
       FILE = Preamble.getSaveFile name.toLowerCase().replace(/[\s+_]/, "-")
       PLAYER.setLocation(PreambleArena.get(1).getStartLocation())
+      Preamble.save()
       Preamble.updatePlayer()
 
     PreambleRegistration.start()
@@ -64,7 +65,7 @@ module.exports = class Preamble
     Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, -> Preamble.newGame()
 
   @load: (file) ->
-    PFILE = file
+    FILE = file
     json = JSON.parse(fs.readFileSync file)
     PLAYER = Player.fromJson json.player
 
@@ -80,9 +81,9 @@ module.exports = class Preamble
         fs.accessSync fullname
         num = if num.length is 0 then 1 else num + 1
       catch
-        return Preamble.getSaveFileName fullname
+        return fullname
 
-  @save: (file = @__file) ->
+  @save: (file = FILE) ->
     json = {}
     json.player = PLAYER.toJson()
     fs.writeFileSync FILE, JSON.stringify(json)

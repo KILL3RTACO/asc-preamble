@@ -5,7 +5,11 @@ Journey           = require "../journey"
 module.exports = class Player
 
   @fromJson: (json, arena) ->
-    player = new Player(json.name, json.gender, json.classification, json.kingdom)
+    gender = g.valueOf json.gender
+    classification = ctypes.valueOf json.classification
+    kingdom = k.valueOf json.kingdom
+
+    player = new Player(json.name, gender, classification, kingdom)
     player.__location = arena.get(json.location.floor).get(json.location.x, json.location.y)
 
   constructor: (@__name, @__gender, @__classification, @__kingdom) ->
@@ -30,13 +34,13 @@ module.exports = class Player
 
   toJson: ->
     name: @__name
-    gender: @__gender
-    classification: @__classification
-    kingdom: @__kingdom
+    gender: @__gender.name()
+    classification: @__classification.name()
+    kingdom: @__kingdom.name()
     location:
       floor: @__location.getFloor().getId()
-      x: @__locaton.getX()
-      y: @__locaton.getY()
+      x: @__location.getX()
+      y: @__location.getY()
 
 class CType extends Enum.GenericEntry
 
