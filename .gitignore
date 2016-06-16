@@ -1,0 +1,9 @@
+/_notes/**
+/.sass-cache/**
+/css/**
+/dist/**
+/fonts/**
+/js/**
+/node_modules/**
+/Gruntfile.coffee
+/package.json
