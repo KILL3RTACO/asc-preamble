@@ -1,6 +1,0 @@
-[submodule "WWT"]
-  path = "lib/WWT"
-  url = "https://github.com/KILL3RTACO/WWT"
-[submodule "JQuery"]
-  path = "lib/JQuery"
-  url = "https://github.com/jquery/jquery"
