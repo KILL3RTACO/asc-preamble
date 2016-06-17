@@ -38,7 +38,8 @@ module.exports =
         <b>is optional</b>. Remember - unsportman-like conduct (such as the intentional maiming or critical injuring of another challenger) will not be tolerated.
         Punishment can range anywhere between disqualification to being charged with an <b><i>Act of Injustice Towards Humanity</i></b>.<br/><br/>
 
-        Below is the registration form to be allowed entrance into the arena. Please <i>double-check</i> all information before submitting.
+        I have sent you the registration form to be allowed entrance into the arena. Please <i>double-check</i> all information before submitting.<br/><br/>
+        #{AI.IRIS.endTransmissionHtml()}
       </div>
       <div style='margin: 1em 0; text-align: center; font-size: 16pt'>Registration Form</div>
     "
