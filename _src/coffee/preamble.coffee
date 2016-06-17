@@ -103,7 +103,7 @@ module.exports = class Preamble
 
     return buttons
 
-  @enableMovement: (buttons) ->
+  @enableMovement: (buttons = Preamble.addMovementButtons()) ->
     dirs = Asc.Section.ALL_DIRECTIONS
     for d in dirs
       do (d) ->
