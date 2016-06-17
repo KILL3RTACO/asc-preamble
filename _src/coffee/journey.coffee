@@ -115,7 +115,10 @@
 
   root.resetButton = (x, y) ->
     testBounds x, y
-    b = root.getButton x, y
+    root.setButtonToDefault root.getButton x, y
+
+  root.setButtonToDefault = (b) ->
+    throw new Error("b must be an instance of wwt.Button") if b not instanceof wwt.Button
     b.setText(".")
      .setTextInvisible()
      .setEnabled(false)
