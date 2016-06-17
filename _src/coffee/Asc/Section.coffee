@@ -41,10 +41,7 @@ module.exports = class Section extends Encounterable
   setZone: (@__zone) ->
   getZone: -> @__zone
 
-  setMovementCost: (cost) ->
-    @__movementCost = cost
-    return @
-  getMovementCost: -> @__movementCost
+  getMovementCost: -> @getEnvironment().getMovementCost()
 
   toJson: ->
     floor: @__floor.getId()
