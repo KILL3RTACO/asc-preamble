@@ -2,16 +2,29 @@
   margin-top: 2em
 
 .load-screen-save:hover, .load-screen-save.selected
-  background-color: #333
+  background-color: #2A2A2A
 
 .load-screen-save
+  background-color: #222
   cursor: pointer
   border-radius: .5em
   border: 1px solid #000
   padding: .75em
 
   .load-screen-save-name
-    font-size: 20pt
+    font-size: 16pt
 
-  .load-screen-save-location div
-    margin-left: 1em
+  .load-screen-save-meta
+    display: block
+    float: right
+
+  .load-screen-save-meta-item:not(:last-child)
+    margin-right: .5em
+
+  .load-screen-save-meta-item
+
+    .glyphicon
+      font-size: .75em
+
+  .load-screen-save-location
+    margin-top: .25em

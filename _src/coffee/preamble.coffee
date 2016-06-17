@@ -114,16 +114,15 @@ module.exports = class Preamble
       kingdom = Asc.Player.Kingdom.valueOf(playerInfo.kingdom).getName()
       container = new wwt.Composite(Journey.getMainContent(), "").addClass("load-screen-save")
       container.append """
-        <div class='load-screen-save-name'>
-          #{playerInfo.name}
+        <span class='load-screen-save-name'>#{playerInfo.name}</span>
+        <div class='load-screen-save-meta'>
+          <span class='load-screen-save-meta-item'>#{Journey.glyphicon("user")} #{gender}</span>
+          <span class='load-screen-save-meta-item'>#{Journey.glyphicon("list")} #{classification}</span>
+          <span class='load-screen-save-meta-item'>#{Journey.glyphicon("tower")} #{kingdom}</span>
         </div>
-        <div class='load-screen-save-gender'><b>Gender</b>: #{gender}</div>
-        <div class='load-screen-save-classification'><b>Classification</b>: #{classification}</div>
-        <div class='load-screen-save-kingdom'><b>Kingdom</b>: #{kingdom}</div>
         <div class='load-screen-save-location'>
-          <b>Location</b>:
-          <div><b>Floor #{location.floor}</b> - #{location.floorName}</div>
-          <div><b>Area</b>: #{location.areaName} - (#{location.x}, #{location.y})</div>
+          <b>Floor</b>: #{location.floor} (#{location.floorName})<br/>
+          <b>Area</b>: #{location.areaName} -- (#{location.x}, #{location.y})
         </div>
       """
       container.$__element.click -> do (key) ->
