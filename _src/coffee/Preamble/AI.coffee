@@ -3,10 +3,11 @@
 
 encode = (num) ->
   return "0" if num is 0
-  letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  # Why this code? Well, theres numbers, RMNT (Remant, a la RWBY) and AVSI (Anavasi, a la Ascension)
+  # No character is repeated, so it could technically be decoded
+  letters = "0123456789RMNTAVSI"
   string = ""
   while num > 0
-    console.log num % letters.length
     string = letters.charAt(num % letters.length) + string
     num //= letters.length
   return string
