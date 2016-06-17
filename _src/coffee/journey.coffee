@@ -42,8 +42,6 @@
     testBounds x, y
     return (BTN_COLS * y) + x
 
-  glyphicon = (g) -> "<span class='glyphicon glyphicon-#{g}'></span>"
-
   hideIfEmpty = (label) ->
     text = label.getText()
     condition = text is null or text is ""
@@ -93,19 +91,21 @@
 
     # First Row
     bg1 = new wwt.ButtonGroup(systemControlsContainer, "JourneySystemControls1")
-    mainMenu = bg1.addButton("JourneySystemMainMenu").setText(glyphicon "menu-hamburger").setTooltip("Main Menu").setEnabled(false)
-    settings = bg1.addButton("JourneySystemSettings").setText(glyphicon "cog").setTooltip("Settings").setEnabled(false)
-    user = bg1.addButton("JourneySystemUser").setText(glyphicon "user").setTooltip("User").setEnabled(false)
+    mainMenu = bg1.addButton("JourneySystemMainMenu").setText(@glyphicon "menu-hamburger").setTooltip("Main Menu").setEnabled(false)
+    settings = bg1.addButton("JourneySystemSettings").setText(@glyphicon "cog").setTooltip("Settings").setEnabled(false)
+    user = bg1.addButton("JourneySystemUser").setText(@glyphicon "user").setTooltip("User").setEnabled(false)
 
     # Second Row
     bg2 = new wwt.ButtonGroup(systemControlsContainer, "JourneySystemControls2")
-    newGame = bg2.addButton("JourneySystemNewGame").setText(glyphicon "edit").setTooltip("New Game").setEnabled(false)
-    loadGame = bg2.addButton("JourneySystemLoadGame").setText(glyphicon "folder-open").setTooltip("Load Game").setEnabled(false)
-    saveGame = bg2.addButton("JourneySystemSaveGame").setText(glyphicon "floppy-disk").setTooltip("Save Game").setEnabled(false).setEnabled(false)
+    newGame = bg2.addButton("JourneySystemNewGame").setText(@glyphicon "edit").setTooltip("New Game").setEnabled(false)
+    loadGame = bg2.addButton("JourneySystemLoadGame").setText(@glyphicon "folder-open").setTooltip("Load Game").setEnabled(false)
+    saveGame = bg2.addButton("JourneySystemSaveGame").setText(@glyphicon "floppy-disk").setTooltip("Save Game").setEnabled(false).setEnabled(false)
 
     # Nothing is done for the right side, it is modified at the game's discretion
 
     hasBeenInit = true
+
+  root.glyphicon = (g) -> "<span class='glyphicon glyphicon-#{g}'></span>"
 
   root.resetButtons = ->
     for x in [0...BTN_COLS]
