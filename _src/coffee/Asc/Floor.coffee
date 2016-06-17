@@ -1,5 +1,5 @@
-{Environment, Section, Town} = require "../asc"
-{GridUtil}                   = require "../common"
+{Environment, Section, Town, Zone} = require "../asc"
+{GridUtil}                         = require "../common"
 
 module.exports = class Floor
 
@@ -15,6 +15,8 @@ module.exports = class Floor
   constructor: (@__id, @__name, @__environment = Environment.FLOOR_PLAINS, @__width = @constructor.DEF_W, @__height = @constructor.DEF_H) ->
     @__sections = []
     @__towns = []
+    @__zones = []
+    @__zonesFinal = false
 
   getId: -> @__id
   getName: -> @__name
@@ -39,6 +41,24 @@ module.exports = class Floor
   getTown: (id) -> return @__towns[id - 1]
   getTowns: -> @__towns.slice 0
   getTownSize: -> @__towns.length
+
+  createZone: (id, name) ->
+    throw new Error("Zones have been finalized") if @__zonesFinal
+    zone = new Zone(id, name)
+    @__zones.push zone
+  getZones: -> @__zones.slice 0
+
+  finalizeZones: ->
+    return if @__zonesFinal or @__zones.length is 0
+    for s in @__sections
+      continue if s.isTownSection()
+      for z in @__zones
+        if z.isInside s.getLocation()
+          s.setZone z
+          for e in z.getEncounters()
+            s.addEncounter e
+    @__zonesFinal = true
+  zonesAreFinal: -> @__zonesFinal
 
   push: (section) ->
     throw new Error("section.getFloor() and this don't match") if section.getFloor().getId() isnt @__id

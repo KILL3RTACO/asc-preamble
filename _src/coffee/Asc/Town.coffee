@@ -32,23 +32,24 @@ module.exports = class Town
       section = arguments[0]
       if section instanceof Section
         throw new Error("Cannot add a section that is not on the same floor") if section.getFloor().getId() != @__floor.getId()
-        @__sections.push section
-        s.clearEncounters()
-        s.addEncounter @__encounter
+        @__push s
       else if Array.isArray section
         @push(s) for s in section
       else # asumed to be a plain object
         s = @__floor.get(section.x, section.y)
         throw new Error("Section not found: (#{section.x}, #{section.y})") if s is null
-        @__sections.push s
-        s.clearEncounters()
-        s.addEncounter @__encounter
-
+        @__push s
       return @
 
     # push(x, y)
     else
       @addSection({x: arguments[0], y: arguments[1]})
+
+  __push: (section) ->
+    @__sections.push section
+    section.clearEncounters()
+    section.addEncounter @__encounter
+    section.setAreaName @__name
 
   getSections: -> @__sections.slice 0
 

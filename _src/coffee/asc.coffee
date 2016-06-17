@@ -1,6 +1,7 @@
 classes =
   Arena: "AscArena"
   Encounter: ""
+  Encounterable: ""
   Environment: ""
   Floor: ""
   FloorRenderer: ""
@@ -9,6 +10,7 @@ classes =
   SkillTree: ""
   Town: ""
   Weapon: ""
+  Zone: ""
 
 module.exports = class Asc
 

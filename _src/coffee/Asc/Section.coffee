@@ -1,7 +1,7 @@
-{GridUtil} = require "../common"
-{Environment} = require "../asc"
+{GridUtil}                   = require "../common"
+{Encounterable, Environment} = require "../asc"
 
-module.exports = class Section
+module.exports = class Section extends Encounterable
 
   {@UP, @DOWN, @LEFT, @RIGHT, @TOP_LEFT, @TOP_RIGHT, @BOTTOM_LEFT, @BOTTOM_RIGHT, @ALL_DIRECTIONS} = require("../Common/Pathfinder.js").Node
   @CARDINAL_DIRECTIONS: [@UP, @DOWN, @LEFT, @RIGHT]
@@ -23,8 +23,8 @@ module.exports = class Section
       else {x: 0, y: 0}
 
   constructor: (@__floor, @__x, @__y, @__environment = @__floor.getEnvironment()) ->
+    super
     @__movementCost = 1
-    @__encounters = []
 
   getFloor: -> @__floor
   getX: -> @__x
@@ -33,33 +33,13 @@ module.exports = class Section
   getEnvironment: -> @__environment
   getNeighbor: (dir) -> @__floor.getNeighborOf(@__x, @__y, dir)
   canMoveTo: (dir) -> @__floor.canMoveTo(@__x, @__y, dir)
+  setAreaName: (@__areaName) ->
+  getAreaName: -> if @__areaName then @__areaName else @__zone.getName()
 
-  addEncounter: (encounter) ->
-    @__encounters.push encounter
-    return @
-  randomEncounter: ->
-    return null if @__encounters.length is 0
-    return @__encounters[0] if @__encounters.length is 1
-    weightSum = 0
-    weightSum += e.getWeight() for e in @__encounters
-    weights = []
-    min = 0
+  isTownSection: -> @getEnvironment().isTownEnvironment()
 
-    for e in @__encounters
-     min = e.getWeight() if min is 0
-     weights.push (if weights.length > 0 then weights[weights.length - 1] else 0) + e.getWeight()
-
-    randomNum = (Math.random() * (weights[weights.length - 1] - min + 1)) + 1
-    for w, i in weights
-     lessThanNext = if i < weights.length -1 then randomNum < weights[i + 1] else true
-     if randomNum >= w and lessThanNext
-        return @__encounters[i]
-
-    return null
-  clearEncounters: ->
-    @__encounters.splice 0
-    return @
-  getEncounterSize: -> @__encounters.length
+  setZone: (@__zone) ->
+  getZone: -> @__zone
 
   setMovementCost: (cost) ->
     @__movementCost = cost

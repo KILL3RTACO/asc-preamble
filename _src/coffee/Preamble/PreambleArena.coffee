@@ -7,6 +7,7 @@ loadHooks = (floor) ->
   try
     console.log "Preamble: Loading FloorHooks for [#{floor.getId()}]"
     require("#{__dirname}/Hooks/Floor#{floor.getId()}.js")(Asc, Preamble, floor)
+    floor.finalizeZones()
   catch error
     console.error "Preamble: Could not load hooks: #{floor.getId()}"
     console.error error
