@@ -12,9 +12,17 @@ hasBeenInit = false
 FILE = null
 PLAYER = null
 
+SAVE_CACHE = {}
+SAVE_CACHE_FILE = "#{__dirname}/Preamble/.save-cache.json"
+SAVE_CACHE_KEY = ""
+
+keyFromFilename = (filename) ->
+  console.log filename
+  return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
+
 module.exports = class Preamble
 
-  @init: ->
+  @init: =>
     return if hasBeenInit
     Journey.init()
     $("head").append "<link rel='stylesheet' href='./css/preamble.css'>"
@@ -37,11 +45,25 @@ module.exports = class Preamble
     Journey.getSystemControl("load-game").addListener wwt.event.Selection, => @loadScreen()
 
     hasBeenInit = true
-    Preamble.mainMenu()
-    Preamble.newGame()
+    @reloadSaveCache()
+    @loadScreen()
 
-  @newGame: ->
-    PreambleRegistration.done ->
+  @checkSaveCache: ->
+    try
+      fs.accessSync SAVE_CACHE_FILE
+      return false
+    catch
+      fs.writeFileSync SAVE_CACHE_FILE, "{}"
+      return true
+  @reloadSaveCache: =>
+    created = @checkSaveCache()
+    SAVE_CACHE = if created then {} else JSON.parse(fs.readFileSync SAVE_CACHE_FILE, "UTF-8")
+  @updateSaveCache: ->
+    SAVE_CACHE[SAVE_CACHE_KEY] = PLAYER.toJson()
+    fs.writeFileSync SAVE_CACHE_FILE, JSON.stringify(SAVE_CACHE)
+
+  @newGame: =>
+    PreambleRegistration.done =>
       PreambleArena.loadIfUnloaded 1
       name = PreambleRegistration.getName()
       classification = PreambleRegistration.getClassification()
@@ -49,46 +71,90 @@ module.exports = class Preamble
       gender = PreambleRegistration.getGender()
       weaponType = PreambleRegistration.getWeaponType()
       PLAYER = new Player(name, gender, classification, kingdom)
-      FILE = Preamble.getSaveFile name.toLowerCase().replace(/[\s+_]/, "-")
+      playerFileName = name.toLowerCase().replace(/[\s+_]/, "-")
+      FILE = @getSaveFile playerFileName
       PLAYER.setLocation(PreambleArena.get(1).getStartLocation())
-      Preamble.save()
-      Preamble.updatePlayer()
+      SAVE_CACHE_KEY = keyFromFilename FILE
+      @save()
+      @updatePlayer()
 
     PreambleRegistration.start()
 
-  @mainMenu: ->
+  @mainMenu: =>
     Journey.reset()
     Journey.getButton(4, 0).setEnabled().setText("Special Thanks").addListener wwt.event.Selection, ->
       Journey.reset()
-      Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, -> Preamble.mainMenu()
+      Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, -> @mainMenu()
       Journey.getMainContent().append specialThanks
-    Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, -> Preamble.newGame()
+    Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, -> @newGame()
 
-  @load: (file) ->
+  @load: (file) =>
     FILE = file
+    SAVE_CACHE_KEY = keyFromFilename FILE
     json = JSON.parse(fs.readFileSync file)
     PLAYER = Player.fromJson json.player
+    @updatePlayer()
 
-  @loadScreen: ->
+  @loadScreen: =>
+    selected = null
+    selectedContainer = null
 
-  @getSaveFileName: (name) -> "#{__dirname}/Preamble/Saves/#{name}.json"
+    updateButtons = ->
+      Journey.getButton(0, 0).setEnabled(selected isnt null)
+      Journey.getButton(1, 0).setEnabled(selected isnt null)
 
-  @getSaveFile: (name) ->
+    Journey.reset()
+    keys = (k for k of SAVE_CACHE)
+    keys.sort (a, b) -> return a.localeCompare(b)
+    for key in keys
+      playerInfo = SAVE_CACHE[key]
+      location = playerInfo.location
+      gender = Asc.Player.Gender.valueOf(playerInfo.gender).getName()
+      classification = Asc.Player.ClassificationType.valueOf(playerInfo.classification).getName()
+      kingdom = Asc.Player.Kingdom.valueOf(playerInfo.kingdom).getName()
+      container = new wwt.Composite(Journey.getMainContent(), "").addClass("load-screen-save")
+      container.append """
+        <div class='load-screen-save-name'>
+          #{playerInfo.name}
+        </div>
+        <div class='load-screen-save-gender'><b>Gender</b>: #{gender}</div>
+        <div class='load-screen-save-classification'><b>Classification</b>: #{classification}</div>
+        <div class='load-screen-save-kingdom'><b>Kingdom</b>: #{kingdom}</div>
+        <div class='load-screen-save-location'>
+          <b>Location</b>:
+          <div><b>Floor #{location.floor}</b> - #{location.floorName}</div>
+          <div><b>Area</b>: #{location.areaName} - (#{location.x}, #{location.y})</div>
+        </div>
+      """
+      container.$__element.click -> do (key) ->
+        selectedContainer.removeClass("selected") if selectedContainer isnt null
+        container.addClass("selected")
+        selected = key
+        selectedContainer = container
+        updateButtons()
+
+    Journey.getButton(0, 0).setText("Load")
+    Journey.getButton(1, 0).setText("Delete")
+
+  @getSaveFileName: (name) => "#{__dirname}/Preamble/Saves/#{name}.json"
+
+  @getSaveFile: (name) =>
     num = ""
     while true
-      fullname = Preamble.getSaveFileName(name + num)
+      fullname = @getSaveFileName(name + num)
       try
         fs.accessSync fullname
         num = if num.length is 0 then 1 else num + 1
       catch
         return fullname
 
-  @save: (file = FILE) ->
+  @save: (file = FILE) =>
     json = {}
     json.player = PLAYER.toJson()
     fs.writeFileSync FILE, JSON.stringify(json)
+    @updateSaveCache()
 
-  @addMovementButtons: (resetButtons = false) ->
+  @addMovementButtons: (resetButtons = false) =>
     Journey.resetButtons() if resetButtons
     buttons = [] # This array is compatible with Section.UP, DOWN, etc..
     buttons.push Journey.getButton(1, 0).setText("North")
@@ -103,7 +169,7 @@ module.exports = class Preamble
 
     return buttons
 
-  @enableMovement: (buttons = Preamble.addMovementButtons()) ->
+  @enableMovement: (buttons = @addMovementButtons()) =>
     dirs = Asc.Section.ALL_DIRECTIONS
     for d in dirs
       do (d) ->
@@ -119,11 +185,11 @@ module.exports = class Preamble
       explore.addListener wwt.event.Selection, ->
         location.randomEncounter().run()
 
-  @updatePlayer: (lookForEncounter = true) ->
+  @updatePlayer: (lookForEncounter = true) =>
     Journey.reset()
     encounter = if lookForEncounter then PLAYER.getLocation().randomEncounter() else null
     if encounter is null # Section has no encounter or disabled
-      Preamble.enableMovement Preamble.addMovementButtons()
+      @enableMovement @addMovementButtons()
     else
       encounter.run()
 

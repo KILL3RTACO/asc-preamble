@@ -38,7 +38,9 @@ module.exports = class Player
     classification: @__classification.name()
     kingdom: @__kingdom.name()
     location:
+      areaName: @__location.getAreaName()
       floor: @__location.getFloor().getId()
+      floorName: @__location.getFloor().getName()
       x: @__location.getX()
       y: @__location.getY()
 
