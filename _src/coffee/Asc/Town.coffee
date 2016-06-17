@@ -8,9 +8,13 @@ module.exports = class Town
     @__sections = []
     @__environment = @__floor.getEnvironment().getTownEnvironment()
     @__encounter = new Encounter("Floor #{@__floor.getId()}: #{@__floor.getName()}", "#{@__name}", "", 1, =>
-      Preamble.enableMovement Preamble.addMovementButtons()
+      mButtons = Preamble.addMovementButtons()
+      desc = @getDescription()
+
+      Preamble.enableMovement mButtons
       Journey.getButton(4, 0).setEnabled().setText("Town Center").addListener wwt.event.Selection, => @enterTownCenter()
-      Journey.getMainContent().append(@getDescription() ? "")
+      Journey.getMainContent().append(if desc then "#{Preamble.AI.ADRIAN.beginTransmissionHtml()}<br/><br/>#{desc}" else "")
+      Journey.setButtonToDefault mButtons[mButtons.length - 1]
     )
 
   getFloor: -> @__floor

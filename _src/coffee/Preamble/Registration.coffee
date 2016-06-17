@@ -26,9 +26,10 @@ module.exports =
     Journey.reset()
     Journey.getMainContent().append "
       <div id='PreambleRegBanner'>
+        #{AI.IRIS.beginTransmissionHtml()}<br/><br/>
         Welcome, challenger, to the 36<sup>th</sup> Celebration of War.<br/><br/>
 
-        My AI-Designation is #{AI.IRIS.getDesignationHtml()}, but I am most often referred to as #{AI.IRIS.getNameHtml()}. I am the manager of this arena; my fellow AIs and I
+        My name is #{AI.IRIS.getNameHtml()}. I am the manager of this arena; my fellow AIs and I
         work together in ensuring the arena is as harsh of a environment as it is humane. As this is the third iteration (and the only implentation) of a floor-based arena,
         some vast improvements have been made. However, we always have new ideas that need to be tested, so be on the lookout for new weapons to use
         and new monsters to fight!<br/><br/>

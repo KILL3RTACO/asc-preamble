@@ -10,14 +10,16 @@ module.exports = (Asc, Preamble, floor) ->
     {x: 21, y: 20}
     {x: 20, y: 21}
     START
-  ])
+  ]).setDescription """
+    {DESCRIPTION}
+  """
 
   floor.addTown("Rubicon B", [
     {x: 7, y: 20}
     {x: 7, y: 21}
   ])
 
-  floor.addTown("Rubicon D", [ # We don't talk about Rubicon C...
+  floor.addTown("Rubicon C", [
     {x: 17, y: 11}
     {x: 18, y: 11}
     {x: 18, y: 12}
