@@ -1,7 +1,11 @@
 Journey          = require "../journey"
-{Player, Weapon} = require "../asc"
-Preamble         = require "../preamble"
-{AI}             = Preamble
+
+Asc    = require "../asc"
+Player = Asc.require "player"
+Weapon = Asc.require "weapon"
+
+Preamble = require "../preamble"
+AI       = Preamble.require "ai"
 
 NAME           = ""
 CLASSIFICATION = null
@@ -66,7 +70,7 @@ module.exports =
     submit = Journey.getButton(1, 0)
 
     name.addListener wwt.event.Modify, (event) ->
-      INVALID_NAME = /[^0-9\-A-z]/
+      INVALID_NAME = /[^0-9 \-A-z]/
       if INVALID_NAME.test event.value
         event.canceled = true
         return

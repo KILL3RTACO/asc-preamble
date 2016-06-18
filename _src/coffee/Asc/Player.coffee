@@ -1,6 +1,11 @@
-Journey           = require "../journey"
-{Section, Weapon} = require "../asc"
-{Enum}            = require "../common"
+Journey = require "../journey"
+
+Enum = require("../common").require "enum"
+
+Asc = require "../asc"
+Floor = Asc.require "floor"
+Section = Asc.require "section"
+Weapon = Asc.require "weapon"
 
 module.exports = class Player
 
@@ -8,12 +13,13 @@ module.exports = class Player
     gender = g.valueOf json.gender
     classification = ctypes.valueOf json.classification
     kingdom = k.valueOf json.kingdom
-    arena.loadIfUnloaded json.location.floor
 
     player = new Player(json.name, gender, classification, kingdom)
-    player.setLocation arena.get(json.location.floor).get(json.location.x, json.location.y)
+    player.setLocation(arena.get(json.location.floor, true, true), json.location.x, json.location.y)
+    return player
 
   constructor: (@__name, @__gender, @__classification, @__kingdom) ->
+    @__location = {}
 
   getName: -> @__name
   getGender: -> @__gender
@@ -21,8 +27,33 @@ module.exports = class Player
   getHailingKingdom: -> @__kingdom
 
   getLocation: -> @__location
-  setLocation: (section) ->
-    @__location = section
+  setLocation:  ->
+    return if arguments.length is 0
+
+    # setLocation(section: Section | {floor?: int, x: int, y: int})
+    if arguments.length is 1
+      section = arguments[0]
+      if section instanceof Section
+        @__location = section
+      else # assumed to be a plain object
+        floor = null
+        if section.floor instanceof Floor
+          floor = section.floor
+        throw new Error("Previous location not set, cannot retrieve current floor") if not floor
+
+        s = if floor then floor.get(section.x, section.y) else null
+        throw new Error("Cannot find section (#{section.x}, #{section.y})") if s is null
+
+        @__location = s
+
+    # setLocation(x: int, y: int)
+    else if arguments.length is 2
+      @setLocation {x: arguments[0], y: arguments[1]}
+
+    # setLocation(floor: Floor, x: int, y: int)
+    else if arguments.length is 3
+      @setLocation {floor: arguments[0], x: arguments[1], y: arguments[2]}
+
     return @
 
   isInTown: -> @__location.getEnvironment().isTownEnvironment()

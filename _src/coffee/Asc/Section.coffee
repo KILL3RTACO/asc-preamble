@@ -1,5 +1,9 @@
-{GridUtil}                   = require "../common"
-{Encounterable, Environment} = require "../asc"
+GridUtil = require("../common").require "grid-util"
+
+Asc           = require '../asc'
+Enocunter     = Asc.require "encounter"
+Encounterable = Asc.require "encounterable"
+Environment   = Asc.require "environment"
 
 module.exports = class Section extends Encounterable
 

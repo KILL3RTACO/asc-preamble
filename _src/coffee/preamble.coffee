@@ -1,7 +1,7 @@
-Journey      = require "./journey.js"
-Asc          = require "./asc"
-{Player}     = Asc
-fs           = require "fs"
+Journey = require "./journey.js"
+Asc     = require "./asc"
+Player  = Asc.require "player"
+fs      = require "fs"
 
 PreambleArena = null
 PreambleRegistration = null
@@ -19,9 +19,40 @@ SAVE_CACHE_KEY = ""
 keyFromFilename = (filename) ->
   return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
 
-module.exports = class Preamble
+classes =
+  ai: "AI"
+  arena: "PreambleArena"
+  registration: "Registration"
 
-  @init: =>
+class Preamble
+
+  require: (depend) -> return require "./Preamble/#{v}" for k, v of classes when k is depend
+
+  TOWN_ENCOUNTER: (town) ->
+    AI = @require("ai")
+    Encounter = Asc.require "encounter"
+    return new Encounter "Floor #{town.getFloor().getId()}: #{town.getFloor().getName()}", "#{town.getName()}", "", 1, =>
+      mButtons = @addMovementButtons()
+      desc = town.getDescription()
+      fullDesc = """
+        #{AI.ADRIAN.beginTransmissionHtml()}<br/><br/>
+
+        #{desc}<br/><br/>
+
+        #{AI.ADRIAN.endTransmissionHtml()}
+      """
+
+      @enableMovement mButtons
+      Journey.getButton(4, 0).setEnabled().setText("Town Center").addListener wwt.event.Selection, -> town.enterTownCenter()
+      Journey.getMainContent().append(if desc then fullDesc else "")
+      Journey.setButtonToDefault mButtons[mButtons.length - 1]
+
+  addTown: (floor, name, sections) ->
+    town = floor.addTown(name, sections)
+    town.setEncounter @TOWN_ENCOUNTER(town)
+    return town
+
+  init: ->
     return if hasBeenInit
     Journey.init()
     $("head").append "<link rel='stylesheet' href='./css/preamble.css'>"
@@ -47,22 +78,22 @@ module.exports = class Preamble
     hasBeenInit = true
     @mainMenu()
 
-  @checkSaveCache: ->
+  checkSaveCache: ->
     try
       fs.accessSync SAVE_CACHE_FILE
       return false
     catch
       fs.writeFileSync SAVE_CACHE_FILE, "{}"
       return true
-  @reloadSaveCache: =>
+  reloadSaveCache: ->
     created = @checkSaveCache()
     SAVE_CACHE = if created then {} else JSON.parse(fs.readFileSync SAVE_CACHE_FILE, "UTF-8")
-  @updateSaveCacheFile: -> fs.writeFile SAVE_CACHE_FILE, JSON.stringify(SAVE_CACHE)
-  @updateSaveCache: ->
+  updateSaveCacheFile: -> fs.writeFile SAVE_CACHE_FILE, JSON.stringify(SAVE_CACHE)
+  updateSaveCache: ->
     SAVE_CACHE[SAVE_CACHE_KEY] = PLAYER.toJson()
     @updateSaveCacheFile()
 
-  @newGame: =>
+  newGame: =>
     PreambleRegistration.done =>
       name = PreambleRegistration.getName()
       classification = PreambleRegistration.getClassification()
@@ -72,14 +103,14 @@ module.exports = class Preamble
       PLAYER = new Player(name, gender, classification, kingdom)
       playerFileName = name.toLowerCase().replace(/[\s+_]/, "-")
       FILE = @getSaveFile playerFileName
-      PLAYER.setLocation(PreambleArena.get(1).getStartLocation())
+      PLAYER.setLocation(PreambleArena.get(1, true, true).getStartLocation())
       SAVE_CACHE_KEY = keyFromFilename FILE
       @save()
       @updatePlayer()
 
     PreambleRegistration.start()
 
-  @mainMenu: =>
+  mainMenu: ->
     Journey.reset()
     Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, => @newGame()
     Journey.getButton(1, 0).setEnabled(true).setText("Load Game").addListener wwt.event.Selection, => @loadScreen()
@@ -88,14 +119,15 @@ module.exports = class Preamble
       Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, => @mainMenu()
       Journey.getMainContent().append specialThanks
 
-  @load: (file) =>
+  load: (file) ->
     FILE = file
     SAVE_CACHE_KEY = keyFromFilename FILE
     json = JSON.parse(fs.readFileSync file)
     PLAYER = Player.fromJson json.player, PreambleArena
     @updatePlayer()
 
-  @loadScreen: =>
+  loadScreen: ->
+    Player = Asc.require "player"
     selected = null
     selectedContainer = null
 
@@ -109,9 +141,9 @@ module.exports = class Preamble
     for key in keys
       playerInfo = SAVE_CACHE[key]
       location = playerInfo.location
-      gender = Asc.Player.Gender.valueOf(playerInfo.gender).getName()
-      classification = Asc.Player.ClassificationType.valueOf(playerInfo.classification).getName()
-      kingdom = Asc.Player.Kingdom.valueOf(playerInfo.kingdom).getName()
+      gender = Player.Gender.valueOf(playerInfo.gender).getName()
+      classification = Player.ClassificationType.valueOf(playerInfo.classification).getName()
+      kingdom = Player.Kingdom.valueOf(playerInfo.kingdom).getName()
       container = new wwt.Composite(Journey.getMainContent(), "").addClass("load-screen-save")
       container.append """
         <span class='load-screen-save-name'>#{playerInfo.name}</span>
@@ -143,9 +175,9 @@ module.exports = class Preamble
       selected = null
       updateButtons()
 
-  @getSaveFileName: (name) => "#{__dirname}/Preamble/Saves/#{name}.json"
+  getSaveFileName: (name) -> "#{__dirname}/Preamble/Saves/#{name}.json"
 
-  @getSaveFile: (name) =>
+  getSaveFile: (name) ->
     num = ""
     while true
       fullname = @getSaveFileName(name + num)
@@ -155,13 +187,13 @@ module.exports = class Preamble
       catch
         return fullname
 
-  @save: (file = FILE) =>
+  save: (file = FILE) ->
     json = {}
     json.player = PLAYER.toJson()
     fs.writeFile FILE, JSON.stringify(json)
     @updateSaveCache()
 
-  @addMovementButtons: (resetButtons = false) =>
+  addMovementButtons: (resetButtons = false) ->
     Journey.resetButtons() if resetButtons
     buttons = [] # This array is compatible with Section.UP, DOWN, etc..
     buttons.push Journey.getButton(1, 0).setText("North")
@@ -176,8 +208,8 @@ module.exports = class Preamble
 
     return buttons
 
-  @enableMovement: (buttons = @addMovementButtons()) =>
-    dirs = Asc.Section.ALL_DIRECTIONS
+  enableMovement: (buttons = @addMovementButtons()) ->
+    dirs = Asc.require("section").ALL_DIRECTIONS
     for d in dirs
       do (d) ->
         b = buttons[d]
@@ -192,7 +224,7 @@ module.exports = class Preamble
       explore.addListener wwt.event.Selection, ->
         location.randomEncounter().run()
 
-  @updatePlayer: (lookForEncounter = true) =>
+  updatePlayer: (lookForEncounter = true) ->
     Journey.reset()
     encounter = if lookForEncounter then PLAYER.getLocation().randomEncounter() else null
     if encounter is null # Section has no encounter or disabled
@@ -202,13 +234,4 @@ module.exports = class Preamble
 
     return @
 
-classes =
-  AI: ""
-  Arena: "PreambleArena"
-  Registration: ""
-
-for k, v of classes
-  file = "./Preamble/#{if v.length is 0 then k else v}"
-  fn = (f) -> return () ->
-    require f
-  Object.defineProperty(Preamble, k, {enumerable: true, get: fn(file)})
+module.exports = new Preamble()

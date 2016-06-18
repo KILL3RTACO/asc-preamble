@@ -1,5 +1,9 @@
-{Environment, Section, Town, Zone} = require "../asc"
-{GridUtil}                         = require "../common"
+Asc         = require "../asc"
+Environment = Asc.require "environment"
+Section     = Asc.require "section"
+Town        = Asc.require "town"
+Zone        = Asc.require "zone"
+GridUtil    = require("../common").require "grid-util"
 
 module.exports = class Floor
 
@@ -49,7 +53,7 @@ module.exports = class Floor
   getZones: -> @__zones.slice 0
 
   finalizeZones: ->
-    return if @__zonesFinal or @__zones.length is 0
+    return if @__zones.length is 0
     for s in @__sections
       continue if s.isTownSection()
       for z in @__zones

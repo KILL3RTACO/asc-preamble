@@ -1,4 +1,4 @@
-Enum = require "../Common/Enum.js"
+Enum = require("../common").require("enum")
 
 class Environment extends Enum.GenericIdEntry
 

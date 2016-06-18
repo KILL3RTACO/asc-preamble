@@ -1,21 +1,15 @@
-Journey              = require "../journey"
-{Section, Encounter} = require "../asc"
-Preamble             = require "../preamble"
+Journey = require "../journey"
+
+Asc       = require "../asc"
+Player    = Asc.require "player"
+Section   = Asc.require "section"
+Encounter = Asc.require "encounter"
 
 module.exports = class Town
 
   constructor: (@__floor, @__name) ->
     @__sections = []
     @__environment = @__floor.getEnvironment().getTownEnvironment()
-    @__encounter = new Encounter("Floor #{@__floor.getId()}: #{@__floor.getName()}", "#{@__name}", "", 1, =>
-      mButtons = Preamble.addMovementButtons()
-      desc = @getDescription()
-
-      Preamble.enableMovement mButtons
-      Journey.getButton(4, 0).setEnabled().setText("Town Center").addListener wwt.event.Selection, => @enterTownCenter()
-      Journey.getMainContent().append(if desc then "#{Preamble.AI.ADRIAN.beginTransmissionHtml()}<br/><br/>#{desc}" else "")
-      Journey.setButtonToDefault mButtons[mButtons.length - 1]
-    )
 
   getFloor: -> @__floor
   getName: -> @__name
@@ -23,6 +17,12 @@ module.exports = class Town
 
   setDescription: (@__description) ->
   getDescription: -> @__description
+
+  setEncounter: (@__encounter) ->
+    for section in @__sections
+      section.clearEncounters()
+      section.addEncounter @__encounter
+  getEncounter: @__encounter
 
   push: ->
     return if arguments.length is 0
@@ -47,8 +47,6 @@ module.exports = class Town
 
   __push: (section) ->
     @__sections.push section
-    section.clearEncounters()
-    section.addEncounter @__encounter
     section.setAreaName @__name
 
   getSections: -> @__sections.slice 0

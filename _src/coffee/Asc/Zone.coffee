@@ -1,5 +1,6 @@
-{Section, Encounterable}  = require "../asc"
-{max, min}                = Math
+Encounterable = require("../asc").require "encounterable"
+
+{max, min} = Math
 
 class PointList
 

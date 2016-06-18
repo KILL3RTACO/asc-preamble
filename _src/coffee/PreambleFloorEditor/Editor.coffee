@@ -1,8 +1,10 @@
 # Asc
-{Environment, FloorRenderer} = require "../asc"
+Asc           = require "../asc"
+FloorRenderer = Asc.require "floor-renderer"
+Environment   = Asc.require "environment"
 
 # Node
-fs       = require "fs"
+fs = require "fs"
 
 # GUI - Widget Declaration
 env = floor = name = width = height = mapDataControl = paintOn = paintEnv = zoneId = pfControl = canvas = null

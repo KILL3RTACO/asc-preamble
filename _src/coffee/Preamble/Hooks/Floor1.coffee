@@ -5,7 +5,7 @@ module.exports = (Asc, Preamble, floor) ->
   floor.setStartLocation START
 
   # Towns
-  floor.addTown("Rubicon A", [
+  Preamble.addTown(floor, "Rubicon A", [
     {x: 20, y: 20}
     {x: 21, y: 20}
     {x: 20, y: 21}
