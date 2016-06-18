@@ -36,16 +36,16 @@ module.exports = class Preamble
 
     specialThanks = fs.readFileSync("#{__dirname}/../special-thanks.html", "UTF-8")
 
-    Journey.getSystemControl("main-menu").addListener wwt.event.Selection, => @mainMenu()
+    @reloadSaveCache()
+    Journey.getSystemControl("main-menu").setEnabled().addListener wwt.event.Selection, => @mainMenu()
     Journey.getSystemControl("settings").addListener wwt.event.Selection, => @settings()
     Journey.getSystemControl("user").addListener wwt.event.Selection, => @user()
-    Journey.getSystemControl("new-game").addListener wwt.event.Selection, => @newGame()
+    Journey.getSystemControl("new-game").setEnabled().addListener wwt.event.Selection, => @newGame()
     Journey.getSystemControl("save-game").addListener wwt.event.Selection, => @save()
-    Journey.getSystemControl("load-game").addListener wwt.event.Selection, => @loadScreen()
+    Journey.getSystemControl("load-game").setEnabled(Object.keys(SAVE_CACHE).length > 0).addListener wwt.event.Selection, => @loadScreen()
 
     hasBeenInit = true
-    @reloadSaveCache()
-    @loadScreen()
+    @mainMenu()
 
   @checkSaveCache: ->
     try
@@ -81,11 +81,12 @@ module.exports = class Preamble
 
   @mainMenu: =>
     Journey.reset()
-    Journey.getButton(4, 0).setEnabled().setText("Special Thanks").addListener wwt.event.Selection, ->
+    Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, => @newGame()
+    Journey.getButton(1, 0).setEnabled(true).setText("Load Game").addListener wwt.event.Selection, => @loadScreen()
+    Journey.getButton(4, 0).setEnabled().setText("Special Thanks").addListener wwt.event.Selection, =>
       Journey.reset()
-      Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, -> @mainMenu()
+      Journey.getButton(0, 0).setEnabled(true).setText("Back").addListener wwt.event.Selection, => @mainMenu()
       Journey.getMainContent().append specialThanks
-    Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, -> @newGame()
 
   @load: (file) =>
     FILE = file
@@ -99,8 +100,8 @@ module.exports = class Preamble
     selectedContainer = null
 
     updateButtons = ->
-      Journey.getButton(0, 0).setEnabled(selected isnt null)
       Journey.getButton(1, 0).setEnabled(selected isnt null)
+      Journey.getButton(2, 0).setEnabled(selected isnt null)
 
     Journey.reset()
     keys = (k for k of SAVE_CACHE)
@@ -131,8 +132,9 @@ module.exports = class Preamble
         selectedContainer = container
         updateButtons()
 
-    Journey.getButton(0, 0).setText("Load").addListener wwt.event.Selection, => @load @getSaveFileName selected
-    Journey.getButton(1, 0).setText("Delete").addListener wwt.event.Selection, =>
+    Journey.getButton(0, 0).setText("Back").setEnabled().addListener wwt.event.Selection, => @mainMenu()
+    Journey.getButton(1, 0).setText("Load").addListener wwt.event.Selection, => @load @getSaveFileName selected
+    Journey.getButton(2, 0).setText("Delete").addListener wwt.event.Selection, =>
       SAVE_CACHE[selected] = undefined
       @updateSaveCacheFile()
       fs.unlink @getSaveFileName(selected)
