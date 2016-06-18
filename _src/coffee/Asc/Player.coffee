@@ -8,9 +8,10 @@ module.exports = class Player
     gender = g.valueOf json.gender
     classification = ctypes.valueOf json.classification
     kingdom = k.valueOf json.kingdom
+    arena.loadIfUnloaded json.location.floor
 
     player = new Player(json.name, gender, classification, kingdom)
-    player.__location = arena.get(json.location.floor).get(json.location.x, json.location.y)
+    player.setLocation arena.get(json.location.floor).get(json.location.x, json.location.y)
 
   constructor: (@__name, @__gender, @__classification, @__kingdom) ->
 
