@@ -17,7 +17,6 @@ SAVE_CACHE_FILE = "#{__dirname}/Preamble/.save-cache.json"
 SAVE_CACHE_KEY = ""
 
 keyFromFilename = (filename) ->
-  console.log filename
   return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
 
 module.exports = class Preamble
@@ -58,13 +57,13 @@ module.exports = class Preamble
   @reloadSaveCache: =>
     created = @checkSaveCache()
     SAVE_CACHE = if created then {} else JSON.parse(fs.readFileSync SAVE_CACHE_FILE, "UTF-8")
+  @updateSaveCacheFile: -> fs.writeFile SAVE_CACHE_FILE, JSON.stringify(SAVE_CACHE)
   @updateSaveCache: ->
     SAVE_CACHE[SAVE_CACHE_KEY] = PLAYER.toJson()
-    fs.writeFileSync SAVE_CACHE_FILE, JSON.stringify(SAVE_CACHE)
+    @updateSaveCacheFile()
 
   @newGame: =>
     PreambleRegistration.done =>
-      PreambleArena.loadIfUnloaded 1
       name = PreambleRegistration.getName()
       classification = PreambleRegistration.getClassification()
       kingdom = PreambleRegistration.getKingdom()
@@ -92,7 +91,7 @@ module.exports = class Preamble
     FILE = file
     SAVE_CACHE_KEY = keyFromFilename FILE
     json = JSON.parse(fs.readFileSync file)
-    PLAYER = Player.fromJson json.player
+    PLAYER = Player.fromJson json.player, PreambleArena
     @updatePlayer()
 
   @loadScreen: =>
@@ -132,8 +131,15 @@ module.exports = class Preamble
         selectedContainer = container
         updateButtons()
 
-    Journey.getButton(0, 0).setText("Load")
-    Journey.getButton(1, 0).setText("Delete")
+    Journey.getButton(0, 0).setText("Load").addListener wwt.event.Selection, => @load @getSaveFileName selected
+    Journey.getButton(1, 0).setText("Delete").addListener wwt.event.Selection, =>
+      SAVE_CACHE[selected] = undefined
+      @updateSaveCacheFile()
+      fs.unlink @getSaveFileName(selected)
+      selectedContainer.dispose()
+      selectedContainer = null
+      selected = null
+      updateButtons()
 
   @getSaveFileName: (name) => "#{__dirname}/Preamble/Saves/#{name}.json"
 
@@ -150,7 +156,7 @@ module.exports = class Preamble
   @save: (file = FILE) =>
     json = {}
     json.player = PLAYER.toJson()
-    fs.writeFileSync FILE, JSON.stringify(json)
+    fs.writeFile FILE, JSON.stringify(json)
     @updateSaveCache()
 
   @addMovementButtons: (resetButtons = false) =>
