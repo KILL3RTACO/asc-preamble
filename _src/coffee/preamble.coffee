@@ -12,9 +12,8 @@ hasBeenInit = false
 FILE = null
 PLAYER = null
 
-SAVE_CACHE = {}
-SAVE_CACHE_FILE = "#{__dirname}/Preamble/.save-cache.json"
-SAVE_CACHE_KEY = ""
+SAVE_DIR = "#{require("electron").remote.app.getAppPath()}/../saves"
+SAVES = []
 
 keyFromFilename = (filename) ->
   return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
@@ -67,31 +66,15 @@ class Preamble
 
     specialThanks = fs.readFileSync("#{__dirname}/../special-thanks.html", "UTF-8")
 
-    @reloadSaveCache()
     Journey.getSystemControl("main-menu").setEnabled().addListener wwt.event.Selection, => @mainMenu()
     Journey.getSystemControl("settings").addListener wwt.event.Selection, => @settings()
     Journey.getSystemControl("user").addListener wwt.event.Selection, => @user()
     Journey.getSystemControl("new-game").setEnabled().addListener wwt.event.Selection, => @newGame()
     Journey.getSystemControl("save-game").addListener wwt.event.Selection, => @save()
-    Journey.getSystemControl("load-game").setEnabled(Object.keys(SAVE_CACHE).length > 0).addListener wwt.event.Selection, => @loadScreen()
+    Journey.getSystemControl("load-game").setEnabled().addListener wwt.event.Selection, => @loadScreen()
 
     hasBeenInit = true
     @mainMenu()
-
-  checkSaveCache: ->
-    try
-      fs.accessSync SAVE_CACHE_FILE
-      return false
-    catch
-      fs.writeFileSync SAVE_CACHE_FILE, "{}"
-      return true
-  reloadSaveCache: ->
-    created = @checkSaveCache()
-    SAVE_CACHE = if created then {} else JSON.parse(fs.readFileSync SAVE_CACHE_FILE, "UTF-8")
-  updateSaveCacheFile: -> fs.writeFile SAVE_CACHE_FILE, JSON.stringify(SAVE_CACHE)
-  updateSaveCache: ->
-    SAVE_CACHE[SAVE_CACHE_KEY] = PLAYER.toJson()
-    @updateSaveCacheFile()
 
   newGame: =>
     PreambleRegistration.done =>
@@ -101,10 +84,9 @@ class Preamble
       gender = PreambleRegistration.getGender()
       weaponType = PreambleRegistration.getWeaponType()
       PLAYER = new Player(name, gender, classification, kingdom)
-      playerFileName = name.toLowerCase().replace(/[\s+_]/, "-")
-      FILE = @getSaveFile playerFileName
+      resolvedPlayerName = name.toLowerCase().replace(/[\s+_]/, "-")
+      FILE = @getSaveFile resolvedPlayerName
       PLAYER.setLocation(PreambleArena.get(1, true, true).getStartLocation())
-      SAVE_CACHE_KEY = keyFromFilename FILE
       @save()
       @updatePlayer()
 
@@ -121,8 +103,11 @@ class Preamble
 
   load: (file) ->
     FILE = file
-    SAVE_CACHE_KEY = keyFromFilename FILE
-    json = JSON.parse(fs.readFileSync file)
+    try
+      json = JSON.parse(fs.readFileSync file)
+    catch err
+      alert "File #{FILE} may be missing or corrupted."
+      return
     PLAYER = Player.fromJson json.player, PreambleArena
     @updatePlayer()
 
@@ -137,19 +122,32 @@ class Preamble
 
     addListener = (container, key) ->
       container.$__element.click (e) ->
-          console.log key
-          $e = $(this)
           selectedContainer.removeClass("selected") if selectedContainer isnt null
-          $e.addClass("selected")
+          container.addClass("selected")
           selected = key
-          selectedContainer = $e
+          selectedContainer = container
           updateButtons()
 
     Journey.reset()
-    keys = (k for k of SAVE_CACHE)
-    keys.sort (a, b) -> return a.localeCompare(b)
+    SAVES = {}
+    try
+      files = fs.readdirSync SAVE_DIR
+      for f in files
+        try
+          json = JSON.parse fs.readFileSync("#{SAVE_DIR}/#{f}")
+          if json and json.player
+            SAVES[keyFromFilename f] = json.player
+        catch
+          continue
+
+    catch err
+
+    keys = (k for k of SAVES)
+
+    keys.sort (a, b) -> SAVES[a].name.localeCompare(SAVES[b].name)
+
     for key in keys
-      playerInfo = SAVE_CACHE[key]
+      playerInfo = SAVES[key]
       location = playerInfo.location
       gender = Player.Gender.valueOf(playerInfo.gender).getName()
       classification = Player.ClassificationType.valueOf(playerInfo.classification).getName()
@@ -172,15 +170,14 @@ class Preamble
     Journey.getButton(0, 0).setText("Back").setEnabled().addListener wwt.event.Selection, => @mainMenu()
     Journey.getButton(1, 0).setText("Load").addListener wwt.event.Selection, => @load @getSaveFileName selected
     Journey.getButton(2, 0).setText("Delete").addListener wwt.event.Selection, =>
-      SAVE_CACHE[selected] = undefined
-      @updateSaveCacheFile()
+      SAVES[selected] = undefined if selected
       fs.unlink @getSaveFileName(selected)
       selectedContainer.dispose()
       selectedContainer = null
       selected = null
       updateButtons()
 
-  getSaveFileName: (name) -> "#{__dirname}/Preamble/Saves/#{name}.json"
+  getSaveFileName: (name) -> "#{SAVE_DIR}/#{name}.json"
 
   getSaveFile: (name) ->
     num = ""
@@ -195,8 +192,10 @@ class Preamble
   save: (file = FILE) ->
     json = {}
     json.player = PLAYER.toJson()
-    fs.writeFile FILE, JSON.stringify(json)
-    @updateSaveCache()
+    try
+      fs.mkdirSync SAVE_DIR
+    catch
+    fs.writeFile file, JSON.stringify(json)
 
   addMovementButtons: (resetButtons = false) ->
     Journey.resetButtons() if resetButtons
