@@ -135,6 +135,16 @@ class Preamble
       Journey.getButton(1, 0).setEnabled(selected isnt null)
       Journey.getButton(2, 0).setEnabled(selected isnt null)
 
+    addListener = (container, key) ->
+      container.$__element.click (e) ->
+          console.log key
+          $e = $(this)
+          selectedContainer.removeClass("selected") if selectedContainer isnt null
+          $e.addClass("selected")
+          selected = key
+          selectedContainer = $e
+          updateButtons()
+
     Journey.reset()
     keys = (k for k of SAVE_CACHE)
     keys.sort (a, b) -> return a.localeCompare(b)
@@ -157,12 +167,7 @@ class Preamble
           <b>Area</b>: #{location.areaName} -- (#{location.x}, #{location.y})
         </div>
       """
-      container.$__element.click -> do (key) ->
-        selectedContainer.removeClass("selected") if selectedContainer isnt null
-        container.addClass("selected")
-        selected = key
-        selectedContainer = container
-        updateButtons()
+      addListener container, key
 
     Journey.getButton(0, 0).setText("Back").setEnabled().addListener wwt.event.Selection, => @mainMenu()
     Journey.getButton(1, 0).setText("Load").addListener wwt.event.Selection, => @load @getSaveFileName selected
