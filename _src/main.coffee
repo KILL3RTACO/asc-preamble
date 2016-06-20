@@ -7,7 +7,6 @@ BrowserWindow = electron.BrowserWindow
 app.on "window-all-closed", -> app.quit() if process.platform isnt "darwin"
 
 app.on "ready", ->
-  app.setAppPath "#{__dirname}"
   WIDTH = 750
   HEIGHT = 350
   win = new BrowserWindow

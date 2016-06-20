@@ -16,7 +16,6 @@
 
   app.on("ready", function() {
     var HEIGHT, WIDTH, atomScreen, monitor, win;
-    app.setAppPath("" + __dirname);
     WIDTH = 750;
     HEIGHT = 350;
     win = new BrowserWindow({
