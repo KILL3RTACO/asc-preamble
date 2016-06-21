@@ -1,11 +1,15 @@
-$scrolbarWidth: .25em
+$scrollbarWidth: .25em
 
 ::-webkit-scrollbar
-  width: $scrolbarWidth
+  width: $scrollbarWidth
+  height: $scrollbarWidth
 
 ::-webkit-scrollbar-track
-  border-radius: $scrolbarWidth
+  border-radius: $scrollbarWidth
 
 ::-webkit-scrollbar-thumb
   background-color: #FFF
-  border-radius: $scrolbarWidth
+  border-radius: $scrollbarWidth
+
+::-webkit-resizer
+  display: none
