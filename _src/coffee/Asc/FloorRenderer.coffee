@@ -29,10 +29,9 @@ module.exports = class FloorRenderer extends MapRenderer
     @setHeight @__floor.getHeight()
   getFloor: -> @__floor
 
-  render: ({x1 = 0, y1 = 0, x2 = @__floor.getWidth(), y2 = @__floor.getHeight()}) ->
+  render: ({x1 = 0, y1 = 0, x2 = @__floor.getWidth(), y2 = @__floor.getHeight()} = {}) ->
     @setWidth x2 - x1
     @setHeight y2 - y1
-    @__updateSize()
     for y in [y1...y2] by 1
       for x in [x1...x2] by 1
         section = @__floor.get x, y
