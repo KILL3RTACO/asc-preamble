@@ -157,10 +157,11 @@
   root.clearRightContent = ->
     right.clear()
     return @
+  root.getMapContainer = -> mapContainer
   root.clearMapContainer = ->
     mapContainer.clear()
     return @
-  root.reset = ({place = false, placeTitle = true, placeLine1 = true, placeLine2 = true, map = true, main = true, buttons = true, right = true}) ->
+  root.reset = ({place = false, placeTitle = true, placeLine1 = true, placeLine2 = true, map = false, main = true, buttons = true, right = true} = {}) ->
     root.clearContent() if main
     root.clearRightContent() if right
     root.resetButtons() if buttons
@@ -169,5 +170,4 @@
     root.setPlaceLine2("") if place or placeLine2
     root.clearMapContainer() if map
 
-  root.getMapContainer = -> mapContainer
 )
