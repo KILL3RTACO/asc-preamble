@@ -15,6 +15,8 @@ PLAYER = null
 SAVE_DIR = "#{require("electron").remote.app.getAppPath()}/../saves"
 SAVES = []
 
+MR = null
+
 keyFromFilename = (filename) ->
   return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
 
@@ -228,8 +230,24 @@ class Preamble
       explore.addListener wwt.event.Selection, ->
         location.randomEncounter().run()
 
+  updateMap: (clear = false) ->
+    if clear
+      MR = null
+      Journey.clearMapContainer()
+      return @
+
+    if MR is null
+      Journey.getMapContainer().append "<canvas id='preamble-minimap'></canvas>"
+      canvas = $("#preamble-minimap")[0]
+      MR = new FloorRenderer()
+      MR.setCanvas canvas
+
+    MR.setFloor PLAYER.getLocation().getFloor()
+
+  #TODO: map updates
   updatePlayer: (lookForEncounter = true) ->
-    Journey.reset()
+    Journey.reset({map: false})
+    @updateMap()
     encounter = if lookForEncounter then PLAYER.getLocation().randomEncounter() else null
     if encounter is null # Section has no encounter or disabled
       @enableMovement @addMovementButtons()
