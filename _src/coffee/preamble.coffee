@@ -1,6 +1,9 @@
 Journey = require "./journey.js"
-Asc     = require "./asc"
-Player  = Asc.require "player"
+
+Asc           = require "./asc"
+FloorRenderer = Asc.require "floor-renderer"
+Player        = Asc.require "player"
+
 fs      = require "fs"
 
 PreambleArena = null
@@ -237,12 +240,22 @@ class Preamble
       return @
 
     if MR is null
-      Journey.getMapContainer().append "<canvas id='preamble-minimap'></canvas>"
-      canvas = $("#preamble-minimap")[0]
+      $canvas = $("<canvas id='preamble-minimap'></canvas>")
+      Journey.getMapContainer().append $canvas
       MR = new FloorRenderer()
-      MR.setCanvas canvas
+      MR.setCanvas $canvas[0]
+      MR.setCellSize 25
 
     MR.setFloor PLAYER.getLocation().getFloor()
+    MR.render()
+    location = PLAYER.getLocation()
+    MR.colorMarkerRaw location.getX(), location.getY(), "orange"
+
+    offsetLocation = {x: Math.max(0, location.getX() - 3), y: Math.max(0, location.getY() - 3)}
+    offsetLeft = MR.getOffset offsetLocation.x
+    offsetTop = MR.getOffset offsetLocation.y
+    Journey.getMapContainer().$__element.scrollTop offsetTop
+    Journey.getMapContainer().$__element.scrollLeft offsetLeft
 
   #TODO: map updates
   updatePlayer: (lookForEncounter = true) ->
