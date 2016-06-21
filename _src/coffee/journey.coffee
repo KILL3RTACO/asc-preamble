@@ -10,6 +10,7 @@
     factory wwt, (window.Journey = {})
 )((wwt, root, electron) ->
   left = null
+  mapContainer = null
   mainContent = null
   buttonContainer = null
   buttons = []
@@ -156,11 +157,17 @@
   root.clearRightContent = ->
     right.clear()
     return @
-  root.reset = (rightContent = true) ->
-    root.clearContent()
-    root.clearRightContent() if rightContent
-    root.resetButtons()
-    root.setPlaceTitle ""
-    root.setPlaceLine1 ""
-    root.setPlaceLine2 ""
+  root.clearMapContainer = ->
+    mapContainer.clear()
+    return @
+  root.reset = ({place = false, placeTitle = true, placeLine1 = true, placeLine2 = true, map = true, main = true, buttons = true, right = true}) ->
+    root.clearContent() if main
+    root.clearRightContent() if right
+    root.resetButtons() if buttons
+    root.setPlaceTitle("") if place or placeTitle
+    root.setPlaceLine1("") if place or placeLine1
+    root.setPlaceLine2("") if place or placeLine2
+    root.clearMapContainer() if map
+
+  root.getMapContainer = -> mapContainer
 )
