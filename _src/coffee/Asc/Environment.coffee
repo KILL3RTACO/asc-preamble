@@ -57,7 +57,7 @@ envs.__addValue("FLOOR_PLAINS", new Environment(1, "Floor (Plains)", 1, "#003e00
 envs.__addValue("FLOOR_SNOW", new Environment(2, "Floor (Snow)", 1, "#ccc"))
 
 # Forest environments - ids 21 - 30
-envs.__addValue("FOREST", new Environment(21, "Forest", "#38761d", 100, ["*"]))
+envs.__addValue("FOREST", new Environment(21, "Forest", 100, "#38761d", ["*"]))
 envs.__addValue("FOREST_DEEP", new Environment(22, "Forest (Deep)", 1, "#274e13", ["*"]))
 envs.__addValue("FOREST_PATH", new Environment(23, "Forest Path", 1, "#459223"))
 
@@ -71,6 +71,6 @@ envs.__addValue("TOWN_PLAINS", new Environment(101, "Town (Plains)", 1, "#999"))
 envs.__addValue("TOWN_SNOW", new Environment(102, "Town (Snow)", 1, "#777"))
 
 # Water environments - 41-50
-envs.__addValue("WATER", new Environment(41, "Water", "#1c4587", 100, ["WATER_DEEP"], false))
+envs.__addValue("WATER", new Environment(41, "Water", 100, "#1c4587", ["WATER_DEEP"], false))
 envs.__addValue("WATER_CROSSING", new Environment(42, "Water Crossing", 1, "#775900"))
 envs.__addValue("WATER_DEEP", new Environment(43, "Water (Deep)", 100, "#20124d", ["WATER"], false))
