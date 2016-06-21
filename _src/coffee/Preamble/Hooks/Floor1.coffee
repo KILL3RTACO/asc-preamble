@@ -11,7 +11,7 @@ module.exports = (Asc, Preamble, floor) ->
     {x: 20, y: 21}
     START
   ]).setDescription """
-    {DESCRIPTION}
+    {TOWN_DESCRIPTION}
   """
 
   floor.addTown("Rubicon B", [
