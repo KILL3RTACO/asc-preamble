@@ -29,9 +29,12 @@ module.exports = class FloorRenderer extends MapRenderer
     @setHeight @__floor.getHeight()
   getFloor: -> @__floor
 
-  render: ->
-    for y in [0...@__floor.getHeight()]
-      for x in [0...@__floor.getWidth()]
+  render: ({x1 = 0, y1 = 0, x2 = @__floor.getWidth(), y2 = @__floor.getHeight()}) ->
+    @setWidth x2 - x1
+    @setHeight y2 - y1
+    @__updateSize()
+    for y in [y1...y2] by 1
+      for x in [x1...x2] by 1
         section = @__floor.get x, y
         sectionVoid = section is null
 
@@ -41,8 +44,8 @@ module.exports = class FloorRenderer extends MapRenderer
         @colorRaw x, y, bg
         @colorBorderRaw x, y, bg
 
-    for y in [0...@__floor.getHeight()]
-      for x in [0...@__floor.getWidth()]
+    for y in [y1...y2] by 1
+      for x in [x1...x2] by 1
         section = @__floor.get x, y
         sectionVoid = section is null
 
