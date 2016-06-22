@@ -25,7 +25,7 @@ module.exports =
     @__doneFn = doneFn
 
   start: ->
-    Journey.reset()
+    Journey.reset({map: true})
     Journey.getMainContent().append "
       <div id='PreambleRegBanner'>
         #{AI.IRIS.beginTransmissionHtml()}<br/><br/>

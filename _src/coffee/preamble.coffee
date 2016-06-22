@@ -98,7 +98,7 @@ class Preamble extends RequireTree
     @Registration.start()
 
   mainMenu: ->
-    Journey.reset()
+    Journey.reset({map: true})
     Journey.getButton(0, 0).setEnabled(true).setText("New Game").addListener wwt.event.Selection, => @newGame()
     Journey.getButton(1, 0).setEnabled(true).setText("Load Game").addListener wwt.event.Selection, => @loadScreen()
     Journey.getButton(4, 0).setEnabled().setText("Special Thanks").addListener wwt.event.Selection, =>
@@ -133,7 +133,7 @@ class Preamble extends RequireTree
           selectedContainer = container
           updateButtons()
 
-    Journey.reset()
+    Journey.reset({map: true})
     SAVES = {}
     try
       files = fs.readdirSync SAVE_DIR
