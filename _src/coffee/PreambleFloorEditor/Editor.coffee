@@ -1,7 +1,5 @@
 # Asc
-Asc           = require "../asc"
-FloorRenderer = Asc.require "floor-renderer"
-Environment   = Asc.require "environment"
+{FloorRender, Environment} = require "../asc"
 
 # Node
 fs = require "fs"
@@ -158,7 +156,7 @@ class EditorUtil
 
   constructor: ->
     @loadState()
-    @arena = require "../Preamble/PreambleArena.js"
+    @arena = require("../preamble").Arena
     @fr = new FloorRenderer()
     @fr.setCanvas canvas
 

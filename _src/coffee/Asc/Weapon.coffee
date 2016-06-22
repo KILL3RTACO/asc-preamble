@@ -1,6 +1,4 @@
-Common = require "../common"
-Enum   = Common.require "enum"
-Util   = Common.require "util"
+{Enum, Util} = require "../common"
 
 Weapon = class module.exports
 

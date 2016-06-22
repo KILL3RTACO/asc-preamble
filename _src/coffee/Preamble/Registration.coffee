@@ -1,11 +1,9 @@
 Journey          = require "../journey"
 
-Asc    = require "../asc"
-Player = Asc.require "player"
-Weapon = Asc.require "weapon"
+{Player, Weapon} = require "../asc"
 
 Preamble = require "../preamble"
-AI       = Preamble.require "ai"
+AI       = Preamble.AI
 
 NAME           = ""
 CLASSIFICATION = null

@@ -1,9 +1,11 @@
-Asc         = require "../asc"
-Environment = Asc.require "environment"
-Section     = Asc.require "section"
-Town        = Asc.require "town"
-Zone        = Asc.require "zone"
-GridUtil    = require("../common").require "grid-util"
+{GridUtil} = require("../common")
+
+{
+  Environment,
+  Section,
+  Town,
+  Zone
+} = require "../asc"
 
 module.exports = class Floor
 
@@ -122,7 +124,7 @@ module.exports = class Floor
       else return false
 
   toPathfinder: ->
-    {Grid} = require "../Common/Pathfinder.js"
+    {Grid} = require("../common").Pathfinder
     nodes = []
     nodes[i] = s.toPathfinder() for s, i in @__sections when s isnt null and s isnt undefined
     return new Grid(nodes, @__width, @__height)
@@ -130,7 +132,7 @@ module.exports = class Floor
   findPath: (start, goal, pfOptions) ->
     throw new Error("start must have a numeric x and y value") if typeof start.x isnt "number" and typeof start.y isnt "number"
     throw new Error("goal must have a numeric x and y value") if typeof goal.x isnt "number" and typeof goal.y isnt "number"
-    Pathfinder = require "../Common/Pathfinder.js"
+    {Pathfinder} = require "../common"
     pfOptions = {} if typeof pfOptions isnt "object"
     pfOptions.grid = @toPathfinder()
 

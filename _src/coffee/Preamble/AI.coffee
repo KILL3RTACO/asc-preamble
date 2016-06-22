@@ -1,6 +1,6 @@
-Enum = require("../common").require "enum"
+{Enum} = require "../common"
 
-{Kingdom} = require("../asc").require("player")
+{Kingdom} = require("../asc").Player
 
 encode = (num) ->
   return "0" if num is 0

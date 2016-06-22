@@ -1,13 +1,15 @@
+# Common
+{RequireTree} = require "./common"
+
 Journey = require "./journey.js"
 
-Asc           = require "./asc"
-FloorRenderer = Asc.require "floor-renderer"
-Player        = Asc.require "player"
+# Asc
+Asc                     = require "./asc"
+{FloorRenderer, Player} = Asc
 
-fs      = require "fs"
+# Node
+fs = require "fs"
 
-PreambleArena = null
-PreambleRegistration = null
 specialThanks = null
 
 hasBeenInit = false
@@ -24,27 +26,27 @@ keyFromFilename = (filename) ->
   return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
 
 classes =
-  ai: "AI"
-  arena: "PreambleArena"
-  registration: "Registration"
-  "map-window": "MapWindow"
+  AI: ""
+  Arena: "PreambleArena"
+  Registration: ""
+  MapWindow: ""
 
-class Preamble
+class Preamble extends RequireTree
 
-  require: (depend) -> return require "./Preamble/#{v}" for k, v of classes when k is depend
+  constructor: ->
+    super module, classes, "./Preamble"
 
   TOWN_ENCOUNTER: (town) ->
-    AI = @require("ai")
-    Encounter = Asc.require "encounter"
+    {Encounter} = Asc
     return new Encounter "Floor #{town.getFloor().getId()}: #{town.getFloor().getName()}", "#{town.getName()}", "", 1, =>
       mButtons = @addMovementButtons()
       desc = town.getDescription()
       fullDesc = """
-        #{AI.ADRIAN.beginTransmissionHtml()}<br/><br/>
+        #{@AI.ADRIAN.beginTransmissionHtml()}<br/><br/>
 
         #{desc}<br/><br/>
 
-        #{AI.ADRIAN.endTransmissionHtml()}
+        #{@AI.ADRIAN.endTransmissionHtml()}
       """
 
       @enableMovement mButtons
@@ -67,10 +69,6 @@ class Preamble
     loadingLabel = new wwt.Label(Journey.getMainContent(), "loadingLabel").setText("Loading...");
     loadingProgress = new wwt.ProgressBar(Journey.getMainContent(), "loadingBar").setIndeterminate();
 
-    #Initialize the Arena
-    PreambleArena = require "./Preamble/PreambleArena.js"
-    PreambleRegistration = require "./Preamble/Registration.js"
-
     specialThanks = fs.readFileSync("#{__dirname}/../special-thanks.html", "UTF-8")
 
     Journey.getSystemControl("main-menu").setEnabled().addListener wwt.event.Selection, => @mainMenu()
@@ -84,20 +82,20 @@ class Preamble
     @mainMenu()
 
   newGame: ->
-    PreambleRegistration.done =>
-      name = PreambleRegistration.getName()
-      classification = PreambleRegistration.getClassification()
-      kingdom = PreambleRegistration.getKingdom()
-      gender = PreambleRegistration.getGender()
-      weaponType = PreambleRegistration.getWeaponType()
+    @Registration.done =>
+      name = @Registration.getName()
+      classification = @Registration.getClassification()
+      kingdom = @Registration.getKingdom()
+      gender = @Registration.getGender()
+      weaponType = @Registration.getWeaponType()
       PLAYER = new Player(name, gender, classification, kingdom)
       resolvedPlayerName = name.toLowerCase().replace(/[\s+_]/, "-")
       FILE = @getSaveFile resolvedPlayerName
-      PLAYER.setLocation(PreambleArena.get(1, true, true).getStartLocation())
+      PLAYER.setLocation(@Arena.get(1, true, true).getStartLocation())
       @save()
       @updatePlayer()
 
-    PreambleRegistration.start()
+    @Registration.start()
 
   mainMenu: ->
     Journey.reset()
@@ -115,11 +113,11 @@ class Preamble
     catch err
       alert "File #{FILE} may be missing or corrupted."
       return
-    PLAYER = Player.fromJson json.player, PreambleArena
+    PLAYER = Player.fromJson json.player, @Arena
     @updatePlayer()
 
   loadScreen: ->
-    Player = Asc.require "player"
+    {Player} = Asc
     selected = null
     selectedContainer = null
 
@@ -220,7 +218,7 @@ class Preamble
     return buttons
 
   enableMovement: (buttons = @addMovementButtons()) ->
-    dirs = Asc.require("section").ALL_DIRECTIONS
+    dirs = Asc.Section.ALL_DIRECTIONS
     for d in dirs
       do (d) ->
         b = buttons[d]

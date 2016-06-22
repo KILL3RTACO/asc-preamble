@@ -1,6 +1,5 @@
-Asc   = require "../asc"
-Arena = Asc.require "arena"
-Floor = Asc.require "floor"
+Asc            = require "../asc"
+{Arena, Floor} = Asc
 
 Preamble  = require "../preamble"
 

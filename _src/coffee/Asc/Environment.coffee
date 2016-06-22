@@ -1,4 +1,4 @@
-Enum = require("../common").require("enum")
+{Enum} = require "../common"
 
 class Environment extends Enum.GenericIdEntry
 

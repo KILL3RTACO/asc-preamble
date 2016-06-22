@@ -1,12 +1,16 @@
+RequireTree =  require "./Common/RequireTree"
+
 classes =
-  enum: "Enum"
-  "grid-util": "GridUtil"
-  "map-renderer": "MapRenderer"
-  pathfinder: "Pathfinder"
-  util: "Util"
+  Enum: ""
+  GridUtil: ""
+  MapRenderer: ""
+  Pathfinder: ""
+  Util: ""
+  RequireTree: ""
 
-class Common
+class Common extends RequireTree
 
-  require: (depend) -> return require "./Common/#{v}" for k, v of classes when k is depend
+  constructor: ->
+    super module, classes, "./Common"
 
 module.exports = new Common()

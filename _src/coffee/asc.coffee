@@ -1,19 +1,22 @@
+{RequireTree} = require  "./common"
+
 classes =
-  arena: "AscArena"
-  encounter: "Encounter"
-  encounterable: "Encounterable"
-  environment: "Environment"
-  floor: "Floor"
-  "floor-renderer": "FloorRenderer"
-  player: "Player"
-  section: "Section"
-  "skill-tree": "SkillTree"
-  town: "Town"
-  weapon: "Weapon"
-  zone: "Zone"
+  Arena: "AscArena"
+  Encounter: ""
+  Encounterable: ""
+  Environment: ""
+  Floor: ""
+  FloorRenderer: ""
+  Player: ""
+  Section: ""
+  SkillTree: ""
+  Town: ""
+  Weapon: ""
+  Zone: ""
 
-class Asc
+class Asc extends RequireTree
 
-  require: (depend) -> return require "./Asc/#{v}" for k, v of classes when k is depend
+  constructor: ->
+    super module, classes, "./Asc"
 
 module.exports = new Asc()

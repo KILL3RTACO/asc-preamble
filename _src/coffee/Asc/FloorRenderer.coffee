@@ -1,8 +1,6 @@
-Section = require("../asc").require "section"
+{Section} = require "../asc"
 
-Common      = require "../common"
-MapRenderer = Common.require "map-renderer"
-GridUtil    = Common.require "grid-util"
+{GridUtil, MapRenderer} = require "../common"
 
 {TOP, BOTTOM, LEFT, RIGHT} = MapRenderer
 

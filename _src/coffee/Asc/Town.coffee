@@ -1,9 +1,6 @@
 Journey = require "../journey"
 
-Asc       = require "../asc"
-Player    = Asc.require "player"
-Section   = Asc.require "section"
-Encounter = Asc.require "encounter"
+{Player, Section, Encounter} = require "../asc"
 
 module.exports = class Town
 

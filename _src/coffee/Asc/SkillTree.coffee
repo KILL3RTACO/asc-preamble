@@ -1,4 +1,4 @@
-Util = require("../common").require "util"
+{Util} = require "../common"
 
 class module.exports
 

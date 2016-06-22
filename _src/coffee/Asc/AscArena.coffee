@@ -1,4 +1,5 @@
-Floor = require("../asc").require "floor"
+# Asc
+{Floor} = require "../asc"
 
 fs = require "fs"
 

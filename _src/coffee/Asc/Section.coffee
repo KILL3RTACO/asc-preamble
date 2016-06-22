@@ -1,9 +1,6 @@
-GridUtil = require("../common").require "grid-util"
+{GridUtil} = require "../common"
 
-Asc           = require '../asc'
-Enocunter     = Asc.require "encounter"
-Encounterable = Asc.require "encounterable"
-Environment   = Asc.require "environment"
+{Encounter, Encounterable, Environment} = require "../asc"
 
 module.exports = class Section extends Encounterable
 
@@ -54,6 +51,6 @@ module.exports = class Section extends Encounterable
     env: @__environment.getId()
 
   toPathfinder: ->
-    {Node} = require "../Common/Pathfinder.js"
+    {Node} = require("../common").Pathfinder
     directions = (@canMoveTo(dir) for dir in @constructor.ALL_DIRECTIONS)
     return new Node(@__x, @__y, directions, @__movementCost)

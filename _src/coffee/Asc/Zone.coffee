@@ -1,4 +1,4 @@
-Encounterable = require("../asc").require "encounterable"
+{Encounterable} = require "../asc"
 
 {max, min} = Math
 

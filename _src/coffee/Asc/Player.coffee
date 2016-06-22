@@ -1,11 +1,8 @@
 Journey = require "../journey"
 
-Enum = require("../common").require "enum"
+{Enum} = require "../common"
 
-Asc = require "../asc"
-Floor = Asc.require "floor"
-Section = Asc.require "section"
-Weapon = Asc.require "weapon"
+{Floor, Section, Weapon} = require "../asc"
 
 module.exports = class Player
 
