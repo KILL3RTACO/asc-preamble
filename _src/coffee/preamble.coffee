@@ -27,6 +27,7 @@ classes =
   ai: "AI"
   arena: "PreambleArena"
   registration: "Registration"
+  "map-window": "MapWindow"
 
 class Preamble
 
@@ -50,6 +51,7 @@ class Preamble
       Journey.getButton(4, 0).setEnabled().setText("Town Center").addListener wwt.event.Selection, -> town.enterTownCenter()
       Journey.getMainContent().append(if desc then fullDesc else "")
       Journey.setButtonToDefault mButtons[mButtons.length - 1]
+      @addMapButton()
 
   addTown: (floor, name, sections) ->
     town = floor.addTown(name, sections)
@@ -81,7 +83,7 @@ class Preamble
     hasBeenInit = true
     @mainMenu()
 
-  newGame: =>
+  newGame: ->
     PreambleRegistration.done =>
       name = PreambleRegistration.getName()
       classification = PreambleRegistration.getClassification()
@@ -233,6 +235,15 @@ class Preamble
       explore.addListener wwt.event.Selection, ->
         location.randomEncounter().run()
 
+  addMapButton: ({x = 4, y = 2} = {}) ->
+    button = Journey.getButton(x, y)
+    Journey.setButtonToDefault button
+    button.setEnabled()
+    button.setText "Map"
+    button.setTooltip "View a map of the current floor you are on"
+    button.addListener wwt.event.Selection, =>
+
+
   updateMap: (clear = false) ->
     if clear
       MR = null
@@ -257,7 +268,6 @@ class Preamble
     Journey.getMapContainer().$__element.scrollTop offsetTop
     Journey.getMapContainer().$__element.scrollLeft offsetLeft
 
-  #TODO: map updates
   updatePlayer: (lookForEncounter = true) ->
     Journey.reset({map: false})
     @updateMap()
