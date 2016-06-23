@@ -63,6 +63,8 @@ class Preamble extends RequireTree
   init: ->
     return if hasBeenInit
     Journey.init()
+    Asc.init()
+
     $("head").append "<link rel='stylesheet' href='./css/preamble.css'>"
 
     # Show a loading screen until most of the loading that needs to be done is finished
@@ -239,8 +241,7 @@ class Preamble extends RequireTree
     button.setEnabled()
     button.setText "Map"
     button.setTooltip "View a map of the current floor you are on"
-    button.addListener wwt.event.Selection, =>
-
+    button.addListener wwt.event.Selection, => @MapWindow.open().selectFloor()
 
   updateMap: (clear = false) ->
     if clear
@@ -265,6 +266,8 @@ class Preamble extends RequireTree
     offsetTop = MR.getOffset offsetLocation.y
     Journey.getMapContainer().$__element.scrollTop offsetTop
     Journey.getMapContainer().$__element.scrollLeft offsetLeft
+
+  getPlayer: -> PLAYER
 
   updatePlayer: (lookForEncounter = true) ->
     Journey.reset({map: false})
