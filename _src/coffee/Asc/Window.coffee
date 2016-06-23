@@ -1,12 +1,13 @@
 Journey = require "../journey"
 
-windowContainer = new wwt.Composite("", "AscWindowBackground")
+windowBackground = new wwt.Composite("", "AscWindowBackground").css({display: "none"})
 
 module.exports = class Window
 
   constructor: (id) ->
     @__contentsCreated = false
-    @__container = new wwt.Composite("", id).addClass("AscWindow")
+    @__windowContainer = new wwt.Composite("", id).addClass("AscWindow").css({display: "none"})
+    @__container = new wwt.Composite(@__windowContainer, "").addClass("AscWindowContent")
 
   # @OverrideMe
   createContents: ->
@@ -17,23 +18,31 @@ module.exports = class Window
     $closeButton = $(Journey.glyphicon("remove"))
     $topBar = $("<div class='AscWindow-TopBar'></div>")
     $closeButton.appendTo $topBar
-    @__container.append $topBar
+    @__windowContainer.append $topBar
+    @__windowContainer.addClass "hasCloseButton"
     $closeButton.click => @close()
     return @
 
   open: ->
     return if @isOpen()
-    @createContents() unless @__contentsCreated
-    windowContainer.$__element.show()
-    @__container.$__element.show()
+    unless @__contentsCreated
+      @createContents()
+      @__contentsCreated = true
+    @__onOpen()
+    windowBackground.$__element.show()
+    @__windowContainer.$__element.show()
     @__open = true
     return @
+
+  __onOpen: ->
+  __onClose: ->
 
   isOpen: -> @__open is true
 
   close: ->
     return unless @isOpen()
-    windowContainer.$__element.hide()
-    @__container.$__element.hide()
+    @__onClose()
+    windowBackground.$__element.hide()
+    @__windowContainer.$__element.hide()
     @__open = false
     return @

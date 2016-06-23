@@ -5,20 +5,37 @@
   width: 100%
   height: 100%
 
+$windowPadding: 1.5em
 .AscWindow
-  $padding: 1em
   z-index: 1050
   position: fixed
-  top: $padding
-  bottom: $padding
-  left: $padding
-  right: $padding
+  top: $windowPadding
+  bottom: $windowPadding
+  left: $windowPadding
+  right: $windowPadding
   border-radius: 3px
   border: 1px solid #FFF
 
+.AscWindowContent
+  position: absolute
+  top: 0
+  left: 0
+  bottom: 0
+  right: 0
+  overflow: auto
+
+$topBarPadding: .5em
+$totalTopBarPadding: $topBarPadding + $windowPadding
+.AscWindow.hasCloseButton .AscWindowContent
+  margin-top: $topBarPadding + 1.5em
+
 .AscWindow-TopBar
+  position: fixed
   text-align: right
-  margin: .25em
+  top: $windowPadding
+  left: $windowPadding
+  right: $windowPadding
+  padding: $topBarPadding
 
   .glyphicon-remove:hover
     cursor: pointer
