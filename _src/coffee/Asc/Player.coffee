@@ -13,6 +13,7 @@ module.exports = class Player
 
     player = new Player(json.name, gender, classification, kingdom)
     player.setLocation(arena.get(json.location.floor, true, true), json.location.x, json.location.y)
+    player.setMaxFloorTraversed json.maxFloor or 1
     return player
 
   constructor: (@__name, @__gender, @__classification, @__kingdom) ->
@@ -22,6 +23,11 @@ module.exports = class Player
   getGender: -> @__gender
   getClassification: -> @__classification
   getHailingKingdom: -> @__kingdom
+
+  setMaxFloorTraversed: (@__maxFloor) ->
+  getMaxFloorTraversed: -> @__maxFloor
+
+  getXY: -> @__location.getLocation()
 
   getLocation: -> @__location
   setLocation:  ->
@@ -53,6 +59,9 @@ module.exports = class Player
 
     return @
 
+  getCurrentFloor: -> @__location.getFloor()
+  getCurrentFloorId: -> @__location.getFloor().getId()
+
   isInTown: -> @__location.getEnvironment().isTownEnvironment()
 
   canMove: (dir) -> return @__location.canMoveTo dir
@@ -72,6 +81,7 @@ module.exports = class Player
       floorName: @__location.getFloor().getName()
       x: @__location.getX()
       y: @__location.getY()
+    maxFloor: @__maxFloor
 
 class CType extends Enum.GenericEntry
 
