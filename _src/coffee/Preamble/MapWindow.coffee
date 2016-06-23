@@ -1,16 +1,11 @@
-{BrowserWindow} = require "elecron"
+{Window} = require "../asc"
 
 class MapWindow
 
-  install: ->
+  constructor: ->
+    super
 
-  show: ->
-
-  close: ->
-
-  isOpen: ->
-
-  setFloor: ->
-
+  createContents: ->
+    @addCloseButton()
 
 module.exports = new MapWindow()
