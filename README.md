@@ -4,7 +4,7 @@ with the 'Ascension' title.
 
 ## Technologies/Dependencies
 **Ascension: Preamble** uses the following:
-* **WWT** - A project I've been working on to provide a full JS API for widgets. Currently the source is unavailable
+* **[WWT](/KILL3RTACO/WWT)** - A project I've been working on to provide a full JS API for widgets.
 * **Journey** - A simple helper to layout and control a single web page for a browser game.
 * **Asc** - The engine
 
