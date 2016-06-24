@@ -13,6 +13,7 @@ classes =
   Town: ""
   Weapon: ""
   Window: ""
+  World: ""
   Zone: ""
 
 class Asc extends RequireTree

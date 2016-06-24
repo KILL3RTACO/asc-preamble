@@ -2,7 +2,7 @@ Journey = require "../journey"
 
 {Enum} = require "../common"
 
-{Floor, Section, Weapon} = require "../asc"
+{Floor, Section, Weapon, World} = require "../asc"
 
 DEF_CREDIT_AMOUNT = 500
 
@@ -11,7 +11,7 @@ module.exports = class Player
   @fromJson: (json, arena) ->
     gender = g.valueOf json.gender
     classification = ctypes.valueOf json.classification
-    kingdom = k.valueOf json.kingdom
+    kingdom = World.Kingdom.valueOf json.kingdom
 
     player = new Player(json.name, gender, classification, kingdom)
     player.setLocation(arena.get(json.location.floor, true, true), json.location.x, json.location.y)
@@ -119,10 +119,3 @@ Player.Gender = g = new Enum()
 g.__addValue("MALE", new Enum.GenericEntry("Male"))
 g.__addValue("FEMALE", new Enum.GenericEntry("Female"))
 g.__addValue("OTHER", new Enum.GenericEntry("Other"))
-
-Player.Kingdom = k = new Enum()
-k.__addValue("ARIA", new Enum.GenericIdEntry(1, "Aria"))
-k.__addValue("DYRE", new Enum.GenericIdEntry(2, "Dyre"))
-k.__addValue("ELODIA", new Enum.GenericIdEntry(3, "Elodia"))
-k.__addValue("HELIX", new Enum.GenericIdEntry(4, "Helix"))
-k.__addValue("VACANT", new Enum.GenericIdEntry(5, "Vacant"))

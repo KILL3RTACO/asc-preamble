@@ -1,6 +1,6 @@
 Journey          = require "../journey"
 
-{Player, Weapon} = require "../asc"
+{Player, Weapon, World} = require "../asc"
 
 Preamble = require "../preamble"
 AI       = Preamble.AI
@@ -50,7 +50,7 @@ module.exports =
     NAME  = ""
     CLASSIFICATION = Player.ClassificationType.values()[0]
     GENDER = Player.Gender.values()[0]
-    KINGDOM = Player.Kingdom.values()[0]
+    KINGDOM = World.Kingdom.values()[0]
     WEAPON_TYPE = CLASSIFICATION.getNormalWeaponTypes()[0]
 
     new wwt.Label(regForm, "nameLabel").setText("Name:")
@@ -60,7 +60,7 @@ module.exports =
     new wwt.Label(regForm, "genderLabel").setText("Gender:")
     gender = populate(new wwt.Combo(regForm, "gender"), Player.Gender).setText(GENDER.getName())
     new wwt.Label(regForm, "kingdomLabel").setText("Hailing Kingdom:")
-    kingdom = populate(new wwt.Combo(regForm, "kingdom"), Player.Kingdom).setText(KINGDOM.getName())
+    kingdom = populate(new wwt.Combo(regForm, "kingdom"), World.Kingdom).setText(KINGDOM.getName())
     new wwt.Label(regForm, "weaponLabel").setText("Weapon of Choice:")
     weapon = populate(new wwt.Combo(regForm, "weapon"), Weapon.Type).setText(WEAPON_TYPE.getName())
 
@@ -83,7 +83,7 @@ module.exports =
         weapon.setText weaponType
         WEAPON_TYPE = weaponType
     gender.addListener wwt.event.Selection, (event) -> GENDER = Player.Gender.values()[event.index]
-    kingdom.addListener wwt.event.Selection, (event) -> KINGDOM = Player.Kingdom.values()[event.index]
+    kingdom.addListener wwt.event.Selection, (event) -> KINGDOM = World.Kingdom.values()[event.index]
     weapon.addListener wwt.event.Selection, (event) ->
       WEAPON_TYPE = Weapon.Type.values()[event.index]
       weaponChosen = true

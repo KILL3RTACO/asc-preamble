@@ -4,8 +4,8 @@
 Journey = require "./journey.js"
 
 # Asc
-Asc                     = require "./asc"
-{FloorRenderer, Player} = Asc
+Asc                            = require "./asc"
+{FloorRenderer, Player, World} = Asc
 
 # Node
 fs = require "fs"
@@ -161,7 +161,7 @@ class Preamble extends RequireTree
       location = playerInfo.location
       gender = Player.Gender.valueOf(playerInfo.gender).getName()
       classification = Player.ClassificationType.valueOf(playerInfo.classification).getName()
-      kingdom = Player.Kingdom.valueOf(playerInfo.kingdom).getName()
+      kingdom = World.Kingdom.valueOf(playerInfo.kingdom).getName()
       container = new wwt.Composite(Journey.getMainContent(), "").addClass("load-screen-save").addClass("noselect")
       container.append """
         <span class='load-screen-save-name'>#{playerInfo.name}</span>

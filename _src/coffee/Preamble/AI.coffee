@@ -1,12 +1,12 @@
 {Enum} = require "../common"
 
-{Kingdom} = require("../asc").Player
+
+{World}   = require("../asc")
+{Kingdom} = World
 
 encode = (num) ->
   return "0" if num is 0
-  # Why this code? Well, theres numbers, RMNT (Remant, a la RWBY) and AVSI (Anavasi, a la Ascension)
-  # No character is repeated, so it could technically be decoded
-  letters = "0123456789RMNTAVSI"
+  letters = "0123456789RMNT#{World.getCode()}"
   string = ""
   while num > 0
     string = letters.charAt(num % letters.length) + string
@@ -18,13 +18,7 @@ encodeTime = -> encode(new Date().getTime())
 class AI extends Enum.GenericIdEntry
 
   constructor: (@__id, @__name, @__nameAbbr, @__level, @__kingdom, @__role) ->
-    @__kingdomAbbr = (switch @__kingdom
-      when Kingdom.ARIA then "ARIA"
-      when Kingdom.DYRE then "DYRE"
-      when Kingdom.ELODIA then "ELDA"
-      when Kingdom.HELIX then "HELX"
-      when Kingdom.VACANT then "VCNT"
-    )
+
   getNameAbbr: -> @__nameAbbr
   getNameHtml: -> "<span class='ai-name-#{@__name.toLowerCase()}'>#{@__name}</span>"
   getDesignationHtml: -> "<span class='ai-designation ai-designation-#{@__name.toLowerCase()}'>#{@getDesignation()}</span>"
@@ -33,7 +27,7 @@ class AI extends Enum.GenericIdEntry
   getLevel: -> @__level
   getRole: -> @__role
   getKingdom: -> @__kingdom
-  getKingdomAbbr: -> @__kingdomAbbr
+  getKingdomAbbr: -> @__kingdom.getCode()
 
   beginTransmission: -> "// #{@getDesignation()} // #{encodeTime()} // TRANSMISSION_START //"
   beginTransmissionHtml: -> "<span class='ai-transmission'>#{@beginTransmission()}</span>"
