@@ -9,6 +9,7 @@ classes = [
   "Floor"
   "FloorRenderer"
   "Player"
+  "PseudoPlayer"
   "Section"
   "SkillTree"
   "Town"
