@@ -123,6 +123,8 @@ class Preamble extends RequireTree
     selected = null
     selectedContainer = null
 
+    loadSelected = => @load @getSaveFileName selected
+
     updateButtons = ->
       Journey.getButton(1, 0).setEnabled(selected isnt null)
       Journey.getButton(2, 0).setEnabled(selected isnt null)
@@ -134,6 +136,7 @@ class Preamble extends RequireTree
           selected = key
           selectedContainer = container
           updateButtons()
+      container.$__element.dblclick -> loadSelected()
 
     Journey.reset({map: true})
     SAVES = {}
@@ -159,7 +162,7 @@ class Preamble extends RequireTree
       gender = Player.Gender.valueOf(playerInfo.gender).getName()
       classification = Player.ClassificationType.valueOf(playerInfo.classification).getName()
       kingdom = Player.Kingdom.valueOf(playerInfo.kingdom).getName()
-      container = new wwt.Composite(Journey.getMainContent(), "").addClass("load-screen-save")
+      container = new wwt.Composite(Journey.getMainContent(), "").addClass("load-screen-save").addClass("noselect")
       container.append """
         <span class='load-screen-save-name'>#{playerInfo.name}</span>
         <div class='load-screen-save-meta'>
@@ -175,7 +178,7 @@ class Preamble extends RequireTree
       addListener container, key
 
     Journey.getButton(0, 0).setText("Back").setEnabled().addListener wwt.event.Selection, => @mainMenu()
-    Journey.getButton(1, 0).setText("Load").addListener wwt.event.Selection, => @load @getSaveFileName selected
+    Journey.getButton(1, 0).setText("Load").addListener wwt.event.Selection, => loadSelected()
     Journey.getButton(2, 0).setText("Delete").addListener wwt.event.Selection, =>
       SAVES[selected] = undefined if selected
       fs.unlink @getSaveFileName(selected)
