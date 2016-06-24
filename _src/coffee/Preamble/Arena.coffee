@@ -5,7 +5,6 @@ Preamble  = require "../preamble"
 
 class PreambleArena extends Arena
 
-
   constructor: ->
     super
 
