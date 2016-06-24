@@ -3,7 +3,7 @@
 
 fs = require "fs"
 
-module.exports = class AscArena
+module.exports = class Arena
 
   constructor: ->
     @__floors = []
