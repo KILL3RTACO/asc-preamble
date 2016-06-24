@@ -5,13 +5,10 @@ Weapon = class module.exports
   @Type:         new Enum()
   @Manufacturer: new Enum()
 
-  constructor: (type, manufacturer, baseDamage) ->
+  constructor: (type, manufacturer) ->
     Util.validateInstance "type", type, Weapon.Type
     Util.validateInstance "manufacturer", manufacturer, Weapon.Manufacturer
-    wwt.util.validateInteger "baseDamage", baseDamage
     @__type = type
-    @__baseDamage = baseDamage
-    @__calculatedDamage = @__baseDamage
 
 
 Weapon.Type.__addValue("AUTOMATIC_RIFLE", new Enum.GenericIdEntry(1, "Automatic Rifle"))
