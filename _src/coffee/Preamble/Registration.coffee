@@ -29,15 +29,15 @@ module.exports =
     Journey.getMainContent().append "
       <div id='PreambleRegBanner'>
         #{AI.IRIS.beginTransmissionHtml()}<br/><br/>
-        Welcome, challenger, to the 36<sup>th</sup> Celebration of War.<br/><br/>
+        Welcome, challenger, to the 36<sup>th</sup> <b>Celebration of Harmony</b>: <i>The Third Trial of Helix</i>.<br/><br/>
 
         My name is #{AI.IRIS.getNameHtml()}. I am the manager of this arena; my fellow AIs and I
-        work together in ensuring the arena is as harsh of a environment as it is humane. As this is the third iteration (and the only implentation) of a floor-based arena,
-        some vast improvements have been made. However, we always have new ideas that need to be tested, so be on the lookout for new weapons to use
-        and new monsters to fight!<br/><br/>
+        work together in ensuring the arena is as harsh of a environment as it is humane. This is the third (floor-based) Arena that Helix
+        has attempted since their first rotation in the <b>Celebration of Harmony</b>. Helix has a strong reputation when it comes to technology, so
+        be on the lookout for new weapons and monsters!<br/><br/>
 
-        It is highly possible that you will encounter other challengers/players. Because this arena is more similar to a race than a tournament, engaging in combat
-        <b>is optional</b>. Remember - unsportman-like conduct (such as the intentional maiming or critical injuring of another challenger) will not be tolerated.
+        It is <i>highly possible</i> that you will encounter other challengers. Because this challenge is more akin to a race than a tournament, engaging in combat
+        <b>is optional</b>. Remember - unsportman-like behavior (such as attacking a challenger after a battle or encounter has been resolved) will not be tolerated.
         Punishment can range anywhere between disqualification to being charged with an <b><i>Act of Injustice Towards Humanity</i></b>.<br/><br/>
 
         I have sent you the registration form to be allowed entrance into the arena. Please <i>double-check</i> all information before submitting.<br/><br/>
