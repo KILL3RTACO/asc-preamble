@@ -4,6 +4,8 @@ Journey = require "../journey"
 
 {Floor, Section, Weapon} = require "../asc"
 
+DEF_CREDIT_AMOUNT = 500
+
 module.exports = class Player
 
   @fromJson: (json, arena) ->
@@ -14,15 +16,25 @@ module.exports = class Player
     player = new Player(json.name, gender, classification, kingdom)
     player.setLocation(arena.get(json.location.floor, true, true), json.location.x, json.location.y)
     player.setMaxFloorTraversed json.maxFloor or 1
+    player.setCredit json.credit or DEF_CREDIT_AMOUNT
     return player
 
-  constructor: (@__name, @__gender, @__classification, @__kingdom) ->
+  constructor: (@__name, @__gender, @__classification, @__kingdom, @__credit = DEF_CREDIT_AMOUNT) ->
     @__location = {}
 
   getName: -> @__name
   getGender: -> @__gender
   getClassification: -> @__classification
   getHailingKingdom: -> @__kingdom
+
+  addCredit: (credit) ->
+    @__credit += credit
+    return @
+  removeCredit: (credit) ->
+    @__credit -= credit
+    return @
+  setCredit: (@__credit) ->
+  getCredit: -> @__credit
 
   setMaxFloorTraversed: (@__maxFloor) ->
   getMaxFloorTraversed: -> @__maxFloor
@@ -82,6 +94,7 @@ module.exports = class Player
       x: @__location.getX()
       y: @__location.getY()
     maxFloor: @__maxFloor
+    credit: @__credit
 
 class CType extends Enum.GenericEntry
 
