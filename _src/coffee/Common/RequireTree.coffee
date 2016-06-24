@@ -1,9 +1,20 @@
 module.exports = class RequireTree
 
   constructor: (mod, classes, requirePrefix) ->
-    for k, v of classes
-      do (k, v) =>
-        path = "#{requirePrefix}/#{if v is null or v.length is 0 then k else v}"
-        Object.defineProperty @, k, 
-          enumerable: true
-          get: -> mod.require path
+    for c in classes
+      do (c) =>
+        path = "#{requirePrefix}/#{c}"
+        if typeof c is "string"
+          Object.defineProperty @, c,
+            enumerable: true
+            get: -> mod.require path
+        else if typeof c is "object"
+          return if not c.name
+          if Array.isArray c.classes
+            Object.defineProperty @, c.name,
+              enumerable: true
+              value: new RequireTree(mod, c.classes, path)
+          else
+            Object.defineProperty @, c.name,
+              enumerable: c.enumerable ? true
+              get: -> mod.require path
