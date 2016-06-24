@@ -25,11 +25,12 @@ MR = null
 keyFromFilename = (filename) ->
   return filename.substring filename.lastIndexOf("/") + 1, filename.lastIndexOf(".")
 
-classes =
-  AI: ""
-  Arena: "PreambleArena"
-  Registration: ""
-  MapWindow: ""
+classes = [
+  "AI"
+  "Arena"
+  "Registration"
+  "MapWindow"
+]
 
 class Preamble extends RequireTree
 

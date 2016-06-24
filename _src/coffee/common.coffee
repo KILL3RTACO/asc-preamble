@@ -1,12 +1,13 @@
 RequireTree =  require "./Common/RequireTree"
 
-classes =
-  Enum: ""
-  GridUtil: ""
-  MapRenderer: ""
-  Pathfinder: ""
-  Util: ""
-  RequireTree: ""
+classes = [
+  "Enum"
+  "GridUtil"
+  "MapRenderer"
+  "Pathfinder"
+  "Util"
+  "RequireTree"
+]
 
 class Common extends RequireTree
 

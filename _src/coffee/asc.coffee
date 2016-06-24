@@ -1,21 +1,22 @@
 {RequireTree} = require  "./common"
 
-classes =
-  AI: ""
-  Arena: "AscArena"
-  Encounter: ""
-  Encounterable: ""
-  Environment: ""
-  Floor: ""
-  FloorRenderer: ""
-  Player: ""
-  Section: ""
-  SkillTree: ""
-  Town: ""
-  Weapon: ""
-  Window: ""
-  World: ""
-  Zone: ""
+classes = [
+  "AI"
+  "Arena"
+  "Encounter"
+  "Encounterable"
+  "Environment"
+  "Floor"
+  "FloorRenderer"
+  "Player"
+  "Section"
+  "SkillTree"
+  "Town"
+  "Weapon"
+  "Window"
+  "World"
+  "Zone"
+]
 
 class Asc extends RequireTree
 
