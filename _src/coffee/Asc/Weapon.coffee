@@ -22,6 +22,7 @@ Weapon.Type.__addValue("SHOTGUN", new Enum.GenericIdEntry(5, "Shotgun"))
 Weapon.Type.__addValue("SNIPER_RIFLE", new Enum.GenericIdEntry(6, "Sniper Rifle"))
 Weapon.Type.__addValue("SWORD", new Enum.GenericIdEntry(76, "Sword"))
 
+Weapon.Manufacturer.__addValue("BROADSIDE", new Enum.GenericEntry("Broadside"))
 Weapon.Manufacturer.__addValue("NAUTILUS", new Enum.GenericEntry("Nautilus"))
 Weapon.Manufacturer.__addValue("NONE", new Enum.GenericEntry("Unknown")) # There is no manufacturer
 Weapon.Manufacturer.__addValue("OMICRON", new Enum.GenericEntry("Omicron"))
