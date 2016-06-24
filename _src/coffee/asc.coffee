@@ -1,6 +1,7 @@
 {RequireTree} = require  "./common"
 
 classes =
+  AI: ""
   Arena: "AscArena"
   Encounter: ""
   Encounterable: ""
