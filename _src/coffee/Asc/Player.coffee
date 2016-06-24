@@ -82,6 +82,9 @@ module.exports = class Player
     throw new Error("Neighbor from move result cannot be null (dir: #{dir})")
     @setLocation section
 
+  getDesignation: ->
+    "#{@__name.replace(/\-/g, "_")}/#{@__gender.name().charAt(0)}/#{@__classification.getCode()}/#{@__kingdom.getCode()}"
+
   toJson: ->
     name: @__name
     gender: @__gender.name()
@@ -98,7 +101,9 @@ module.exports = class Player
 
 class CType extends Enum.GenericEntry
 
-  constructor: (@__name, @__weaponTypes) ->
+  constructor: (@__name, @__code, @__weaponTypes) ->
+
+  getCode: -> @__code
 
   getNormalWeaponTypes: -> @__weaponTypes.slice 0
   getNormalWeaponTypesString: ->
@@ -108,12 +113,12 @@ class CType extends Enum.GenericEntry
     str += @__weaponTypes[@__weaponTypes.length - 1].getName()
 
 Player.ClassificationType = ctypes = new Enum()
-ctypes.__addValue("AURORA", new CType("Aurora", [Weapon.Type.SWORD]))
-ctypes.__addValue("GOLEM", new CType("Golem", [Weapon.Type.MINIGUN, Weapon.Type.ROCKET_LAUNCHER, Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
-ctypes.__addValue("SALAMANDER", new CType("Salamander", [Weapon.Type.SHOTGUN, Weapon.Type.AUTOMATIC_RIFLE]))
-ctypes.__addValue("SHADOWBORNE", new CType("Shadowborne", [Weapon.Type.SNIPER_RIFLE]))
-ctypes.__addValue("XARYA", new CType("Xarya", [Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
-ctypes.__addValue("ZEPHYR", new CType("Zephyr", [Weapon.Type.MARKSMAN_RIFLE, Weapon.Type.AUTOMATIC_RIFLE]))
+ctypes.__addValue("AURORA", new CType("Aurora", "AUR", [Weapon.Type.SWORD]))
+ctypes.__addValue("GOLEM", new CType("Golem", "GLM", [Weapon.Type.MINIGUN, Weapon.Type.ROCKET_LAUNCHER, Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
+ctypes.__addValue("SALAMANDER", new CType("Salamander", "SLM", [Weapon.Type.SHOTGUN, Weapon.Type.AUTOMATIC_RIFLE]))
+ctypes.__addValue("SHADOWBORNE", new CType("Shadowborne", "SBN", [Weapon.Type.SNIPER_RIFLE]))
+ctypes.__addValue("XARYA", new CType("Xarya", "XRA", [Weapon.Type.AUTOMATIC_RIFLE, Weapon.Type.MARKSMAN_RIFLE]))
+ctypes.__addValue("ZEPHYR", new CType("Zephyr", "ZPR", [Weapon.Type.MARKSMAN_RIFLE, Weapon.Type.AUTOMATIC_RIFLE]))
 
 Player.Gender = g = new Enum()
 g.__addValue("MALE", new Enum.GenericEntry("Male"))
