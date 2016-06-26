@@ -28,8 +28,9 @@ keyFromFilename = (filename) ->
 classes = [
   "AI"
   "Arena"
-  "Registration"
   "MapWindow"
+  "Registration"
+  "RegistrationHelp"
 ]
 
 class Preamble extends RequireTree

@@ -3,7 +3,6 @@ Journey          = require "../journey"
 {Player, Weapon, World} = require "../asc"
 
 Preamble = require "../preamble"
-AI       = Preamble.AI
 
 NAME           = ""
 CLASSIFICATION = null
@@ -25,6 +24,7 @@ module.exports =
     @__doneFn = doneFn
 
   start: ->
+    {AI} = Preamble
     Journey.reset({map: true})
     Journey.getMainContent().append "
       <div id='PreambleRegBanner'>
@@ -53,9 +53,14 @@ module.exports =
     KINGDOM = World.Kingdom.values()[0]
     WEAPON_TYPE = CLASSIFICATION.getNormalWeaponTypes()[0]
 
+    {RegistrationHelp} = Preamble
+
+    makeHelpLabel = (id, text, win) ->
+      new wwt.Label(new wwt.Composite(regForm, "#{id}Container"), id).addClass("preamble-registration-help").setText(text).$__element.click -> win.open()
+
     new wwt.Label(regForm, "nameLabel").setText("Name:")
     name = new wwt.Text(regForm, "name").setPlaceholder("Full Name")
-    new wwt.Label(regForm, "classLabel").setText("Classification:")
+    makeHelpLabel("classLabel", "Classification:", RegistrationHelp.Classification)
     classification = populate(new wwt.Combo(regForm, "classification"), Player.ClassificationType).setText(CLASSIFICATION.getName())
     new wwt.Label(regForm, "genderLabel").setText("Gender:")
     gender = populate(new wwt.Combo(regForm, "gender"), Player.Gender).setText(GENDER.getName())
@@ -89,11 +94,23 @@ module.exports =
       weaponChosen = true
 
     cancel.setEnabled().setText("Cancel").addListener wwt.event.Selection, -> Preamble.mainMenu()
-    submit.setText("Submit").addListener wwt.event.Selection, =>
-      @__doneFn.call() if typeof @__doneFn is "function"
+    submit.setText("Submit").addListener wwt.event.Selection, => @enterArena()
 
   getName: -> NAME
   getClassification: -> CLASSIFICATION
   getKingdom: -> KINGDOM
   getGender: ->  GENDER
   getWeaponType: -> WEAPON_TYPE
+
+  enterArena: ->
+    Journey.reset()
+    Journey.getMainContent().append """
+      As per the rules of entering the Arena, you hand in all loose personal belongings, essentially everything except your clothing.
+      Anything you have handed over is stored in a locker that you can open upon completing, forfeiting, or being disqualified from the challenge.<br/><br/>
+
+      Upon entrance of the Arena, you will be given a {Placeholder: DEF_WEAPON_FROM_TYPE}<br/><br/>
+
+      Do you wish to continue?
+    """
+    Journey.getButton(0, 0).setEnabled().setText("Enter").addListener wwt.event.Selection, => @__doneFn.call() if typeof @__doneFn is "function"
+    Journey.getButton(1, 0).setEnabled().setText("Leave").addListener wwt.event.Selection, -> Preamble.mainMenu()
