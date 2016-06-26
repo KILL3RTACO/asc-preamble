@@ -11,6 +11,12 @@ module.exports = class World
 
   @getName: -> "Anavasi"
   @getCode: -> "AVSI"
+  @getChallengeTraditionName: -> "Celebration of Harmony"
+  @getChallengeTraditionNameHtml: -> "<b>#{@getChallengeTraditionName()}</b>"
+  @getFirstWarName: -> ""
+  @getFirstWarNameHtml: -> "<i>#{@getFirstWarName()}</i>"
+  @getSecondWarName: -> "The Luminant War"
+  @getSecondWarNameHtml: -> "<i>#{@getSecondWarName()}</i>"
 
 World.Kingdom = k = new Enum()
 k.__addValue("ARIA", new Kingdom(1, "Aria", "ARIA"))
