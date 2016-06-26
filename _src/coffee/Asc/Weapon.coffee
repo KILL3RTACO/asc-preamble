@@ -5,10 +5,18 @@ Weapon = class module.exports
   @Type:         new Enum()
   @Manufacturer: new Enum()
 
-  constructor: (type, manufacturer) ->
+  @fromJson: (json) ->
+    
+
+  constructor: (@__id, @__name, @__desc, type, manufacturer) ->
     Util.validateInstance "type", type, Weapon.Type
     Util.validateInstance "manufacturer", manufacturer, Weapon.Manufacturer
     @__type = type
+    @__manufacturer = manufacturer
+
+  getId: -> @__id
+  getType: -> @__type
+  getManufacturer: -> @__manufacturer
 
 
 Weapon.Type.__addValue("AUTOMATIC_RIFLE", new Enum.GenericIdEntry(1, "Automatic Rifle"))
