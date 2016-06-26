@@ -31,6 +31,7 @@ classes = [
   "MapWindow"
   "Registration"
   "RegistrationHelp"
+  "WeaponRegistry"
 ]
 
 class Preamble extends RequireTree
